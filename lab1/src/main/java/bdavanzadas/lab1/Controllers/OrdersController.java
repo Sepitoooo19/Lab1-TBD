@@ -1,0 +1,65 @@
+package bdavanzadas.lab1.Controllers;
+
+import bdavanzadas.lab1.entities.OrdersEntity;
+import bdavanzadas.lab1.services.OrdersService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/orders")
+@CrossOrigin(origins = "*") // Permite llamadas desde tu frontend Nuxt
+public class OrdersController {
+
+    private final OrdersService ordersService;
+
+    public OrdersController(OrdersService ordersService) {
+        this.ordersService = ordersService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrdersEntity>> getAllOrders() {
+        return ResponseEntity.ok(ordersService.getAllOrders());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrdersEntity> getOrderById(@PathVariable int id) {
+        OrdersEntity order = ordersService.getOrderById(id);
+        if (order != null) {
+            return ResponseEntity.ok(order);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> addOrder(@RequestBody OrdersEntity order) {
+        ordersService.addOrder(order);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateOrder(@PathVariable int id, @RequestBody OrdersEntity order) {
+        order.setId(id);
+        ordersService.updateOrder(order);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable int id) {
+        ordersService.deleteOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<OrdersEntity>> getOrdersByClientId(@PathVariable int clientId) {
+        List<OrdersEntity> orders = ordersService.getOrdersByClientId(clientId);
+        if (orders != null && !orders.isEmpty()) {
+            return ResponseEntity.ok(orders);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
