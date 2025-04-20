@@ -16,6 +16,5 @@ public class OrdersEntity {
     private Date deliveryDate;
     private String status;
     private int clientId;
-    private int products;
     private double totalPrice;
 }

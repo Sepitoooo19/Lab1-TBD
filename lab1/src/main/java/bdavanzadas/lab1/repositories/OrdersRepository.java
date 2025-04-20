@@ -22,20 +22,19 @@ public class OrdersRepository {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
-                        rs.getInt("products"),
                         rs.getDouble("total_price")
                 )
         );
     }
 
     public void save(OrdersEntity order) {
-        String sql = "INSERT INTO orders (order_date, delivery_date, status, client_id, products, total_price) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getProducts(), order.getTotalPrice());
+        String sql = "INSERT INTO orders (order_date, delivery_date, status, client_id, , total_price) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getTotalPrice());
     }
 
     public void update(OrdersEntity order) {
-        String sql = "UPDATE orders SET order_date = ?, delivery_date = ?, status = ?, client_id = ?, products = ?, total_price = ? WHERE id = ?";
-        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getProducts(), order.getTotalPrice(), order.getId());
+        String sql = "UPDATE orders SET order_date = ?, delivery_date = ?, status = ?, client_id = ?, total_price = ? WHERE id = ?";
+        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getTotalPrice(), order.getId());
     }
 
     public void delete(int id) {
@@ -52,7 +51,6 @@ public class OrdersRepository {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
-                        rs.getInt("products"),
                         rs.getDouble("total_price")
                 )
         );
@@ -67,7 +65,6 @@ public class OrdersRepository {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
-                        rs.getInt("products"),
                         rs.getDouble("total_price")
                 )
         );
