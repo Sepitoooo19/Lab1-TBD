@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Repository
-public class RatingRepository {
+public class RatingRepository implements RatingRepositoryInt {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

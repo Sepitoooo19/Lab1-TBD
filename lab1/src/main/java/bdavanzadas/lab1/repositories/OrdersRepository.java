@@ -1,14 +1,18 @@
 package bdavanzadas.lab1.repositories;
 
+import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
-public class OrdersRepository {
+public class OrdersRepository implements OrdersRepositoryInt {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -72,4 +76,44 @@ public class OrdersRepository {
                 )
         );
     }
+
+    public List<OrdersEntity> findByDealerId(int dealerId) {
+        String sql = "SELECT * FROM orders WHERE dealer_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{dealerId}, (rs, rowNum) ->
+                new OrdersEntity(
+                        rs.getInt("id"),
+                        rs.getDate("order_date"),
+                        rs.getDate("delivery_date"),
+                        rs.getString("status"),
+                        rs.getInt("client_id"),
+                        rs.getInt("products"),
+                        rs.getDouble("total_price")
+                )
+        );
+    }
+
+    public Map<String, Object> getTopSpender() {
+        String sql = """
+        SELECT c.id, c.name, c.rut, c.email, c.phone, c.address, SUM(o.total_price) AS total_spent
+        FROM orders o
+        JOIN clients c ON o.client_id = c.id
+        WHERE o.status = 'entregado'
+        GROUP BY c.id, c.name, c.rut, c.email, c.phone, c.address
+        ORDER BY total_spent DESC
+        LIMIT 1
+    """;
+
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("id", rs.getInt("id"));
+            result.put("name", rs.getString("name"));
+            result.put("rut", rs.getString("rut"));
+            result.put("email", rs.getString("email"));
+            result.put("phone", rs.getString("phone"));
+            result.put("address", rs.getString("address"));
+            result.put("totalSpent", rs.getDouble("total_spent"));
+            return result;
+        });
+    }
+
 }

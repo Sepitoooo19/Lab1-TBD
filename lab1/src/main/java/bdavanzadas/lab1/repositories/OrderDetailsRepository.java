@@ -10,12 +10,12 @@ import java.util.List;
 
 
 @Repository
-public class OrderDetailsRepository {
+public class OrderDetailsRepository implements OrderDetailsRepositoryInt {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<OrderDetailsEntity> findAll() {
+    public List<OrderDetailsEntity> findAll()  {
         String sql = "SELECT * FROM order_details";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new OrderDetailsEntity(
