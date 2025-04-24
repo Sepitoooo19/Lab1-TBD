@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Repository
-public class ClientRepository {
+public class ClientRepository implements ClientRepositoryInt {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

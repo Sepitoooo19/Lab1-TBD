@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.Controllers;
 
+import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.services.OrdersService;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
@@ -62,4 +64,14 @@ public class OrdersController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/top-spender")
+    public ResponseEntity<Map<String, Object>> getTopSpender() {
+        Map<String, Object> topSpender = ordersService.getTopSpender();
+        return ResponseEntity.ok(topSpender);
+    }
+
+
+
+
 }

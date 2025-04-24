@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class DealerRepository {
+public class DealerRepository  implements DealerRepositoryInt {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

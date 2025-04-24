@@ -1,11 +1,13 @@
 package bdavanzadas.lab1.services;
 
+import bdavanzadas.lab1.entities.ClientEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrdersService {
@@ -45,5 +47,16 @@ public class OrdersService {
     @Transactional(readOnly = true)
     public List<OrdersEntity> getOrdersByClientId(int clientId) {
         return ordersRepository.findByClientId(clientId);
+    }
+
+    // en el repository se hace un query para obtener todos los pedidos de un dealer
+    @Transactional(readOnly = true)
+    public List<OrdersEntity> getOrdersByDealerId(int dealerId) {
+        return ordersRepository.findByDealerId(dealerId);
+    }
+
+    // en el repository se hace un query para obtener el cliente que mas gasto
+    public Map<String, Object> getTopSpender() {
+        return ordersRepository.getTopSpender();
     }
 }
