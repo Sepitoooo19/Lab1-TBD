@@ -32,7 +32,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/clients/**", "/orders/**","/paymentmethod/**").permitAll() // 🔓 ESTO PERMITE /auth/login
+                        .requestMatchers("/auth/register",
+                                        "/auth/login",
+                                        "/clients/**",
+                                        "/dealers/**",
+                                "/orders/**").permitAll() // Permitir acceso público para registrar usuarios
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -42,7 +46,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); // Usa BCrypt para codificar contraseñas
     }
 
     public OncePerRequestFilter jwtFilter() {
@@ -50,15 +54,24 @@ public class SecurityConfig {
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
                     throws ServletException, IOException {
+                // Extraer la cabecera de autorización
                 String authHeader = request.getHeader("Authorization");
+
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                    String token = authHeader.substring(7);
+                    String token = authHeader.substring(7); // Extraer el token después de "Bearer "
+
+                    // Validar el token
                     if (jwtUtil.validateToken(token)) {
-                        String username = jwtUtil.extractUsername(token);
-                        var auth = new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
+                        // Extraer el rol del token
+                        String role = jwtUtil.extractRole(token);
+
+                        // Configurar el contexto de seguridad con el rol
+                        var auth = new UsernamePasswordAuthenticationToken(role, null, Collections.singletonList(() -> role));
                         SecurityContextHolder.getContext().setAuthentication(auth);
                     }
                 }
+
+                // Continuar con el filtro
                 filterChain.doFilter(request, response);
             }
         };

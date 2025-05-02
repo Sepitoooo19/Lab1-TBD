@@ -21,35 +21,45 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<List<ClientEntity>> getAllClients() {
-        return ResponseEntity.ok(clientService.getAllClients());
+        List<ClientEntity> clients = clientService.getAllClients();
+        return new ResponseEntity<>(clients, HttpStatus.OK);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<ClientEntity> getClientById(@PathVariable int id) {
         ClientEntity client = clientService.getClientById(id);
         if (client != null) {
-            return ResponseEntity.ok(client);
+            return new ResponseEntity<>(client, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping
-    public ResponseEntity<Void> addClient(@RequestBody ClientEntity client) {
-        clientService.addClient(client);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<ClientEntity> createClient(@RequestBody ClientEntity client) {
+        clientService.saveClient(client);
+        return new ResponseEntity<>(client, HttpStatus.CREATED);
     }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateClient(@PathVariable int id, @RequestBody ClientEntity client) {
-        client.setId(id);
-        clientService.updateClient(client);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ClientEntity> updateClient(@PathVariable int id, @RequestBody ClientEntity client) {
+        ClientEntity existingClient = clientService.getClientById(id);
+        if (existingClient != null) {
+            client.setId(id);
+            clientService.updateClient(client);
+            return new ResponseEntity<>(client, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable int id) {
-        clientService.deleteClient(id);
-        return ResponseEntity.noContent().build();
+        ClientEntity existingClient = clientService.getClientById(id);
+        if (existingClient != null) {
+            clientService.deleteClient(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
+
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.repositories.ClientRepository;
+import bdavanzadas.lab1.entities.UserEntity;
 
 import java.util.List;
 
@@ -21,8 +22,13 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public ClientEntity getClientById(int id) {
+        return clientRepository.findById(id);
+    }
+
     @Transactional
-    public void addClient(ClientEntity client) {
+    public void saveClient(ClientEntity client) {
         clientRepository.save(client);
     }
 
@@ -36,8 +42,6 @@ public class ClientService {
         clientRepository.delete(id);
     }
 
-    @Transactional(readOnly = true)
-    public ClientEntity getClientById(int id) {
-        return clientRepository.findById(id);
-    }
+
+
 }

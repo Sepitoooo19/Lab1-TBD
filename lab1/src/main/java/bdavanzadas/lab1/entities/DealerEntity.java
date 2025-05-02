@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DealerEntity {
-
     private int id;
     private String rut;
     private String name;
@@ -16,4 +15,6 @@ public class DealerEntity {
     private String email;
     private String vehicle;
     private String plate;
+
+    private int userId; // Relación con UserEntity
 }

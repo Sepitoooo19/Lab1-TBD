@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.Controllers;
 
+import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.services.OrdersService;
@@ -66,8 +67,8 @@ public class OrdersController {
     }
 
     @GetMapping("/top-spender")
-    public ResponseEntity<Map<String, Object>> getTopSpender() {
-        Map<String, Object> topSpender = ordersService.getTopSpender();
+    public ResponseEntity<TopSpenderDTO> getTopSpender() {
+        TopSpenderDTO topSpender = ordersService.getTopSpender();
         return ResponseEntity.ok(topSpender);
     }
 

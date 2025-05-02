@@ -21,35 +21,47 @@ public class DealerController {
 
     @GetMapping
     public ResponseEntity<List<DealerEntity>> getAllDealers() {
-        return ResponseEntity.ok(dealerService.getAllDealers());
+        List<DealerEntity> dealers = dealerService.getAllDealers();
+        return new ResponseEntity<>(dealers, HttpStatus.OK);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<DealerEntity> getDealerById(@PathVariable int id) {
         DealerEntity dealer = dealerService.getDealerById(id);
         if (dealer != null) {
-            return ResponseEntity.ok(dealer);
+            return new ResponseEntity<>(dealer, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @PostMapping
-    public ResponseEntity<Void> addDealer(@RequestBody DealerEntity dealer) {
+    public ResponseEntity<DealerEntity> createDealer(@RequestBody DealerEntity dealer) {
         dealerService.saveDealer(dealer);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(dealer, HttpStatus.CREATED);
     }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateDealer(@PathVariable int id, @RequestBody DealerEntity dealer) {
-        dealer.setId(id);
-        dealerService.saveDealer(dealer);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<DealerEntity> updateDealer(@PathVariable int id, @RequestBody DealerEntity dealer) {
+        DealerEntity existingDealer = dealerService.getDealerById(id);
+        if (existingDealer != null) {
+            dealer.setId(id);
+            dealerService.updateDealer(dealer);
+            return new ResponseEntity<>(dealer, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDealer(@PathVariable int id) {
-        dealerService.deleteDealer(id);
-        return ResponseEntity.noContent().build();
+        DealerEntity existingDealer = dealerService.getDealerById(id);
+        if (existingDealer != null) {
+            dealerService.deleteDealer(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
+
+
+
 }
