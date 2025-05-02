@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.services;
 
+import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,8 @@ public class OrdersService {
     }
 
     // en el repository se hace un query para obtener el cliente que mas gasto
-    public Map<String, Object> getTopSpender() {
+    @Transactional(readOnly = true)
+    public TopSpenderDTO getTopSpender() {
         return ordersRepository.getTopSpender();
     }
 }

@@ -22,19 +22,22 @@ public class DealerService {
     public List<DealerEntity> getAllDealers() {
         return dealerRepository.findAll();
     }
-
+    @Transactional(readOnly = true)
+    public DealerEntity getDealerById(int id) {
+        return dealerRepository.findById(id);
+    }
     @Transactional
     public void saveDealer(DealerEntity dealer) {
         dealerRepository.save(dealer);
     }
-
+    @Transactional
+    public void updateDealer(DealerEntity dealer) {
+        dealerRepository.update(dealer);
+    }
     @Transactional
     public void deleteDealer(int id) {
         dealerRepository.delete(id);
     }
 
-    @Transactional(readOnly = true)
-    public DealerEntity getDealerById(int id) {
-        return dealerRepository.findById(id);
-    }
+
 }

@@ -4,32 +4,19 @@ import bdavanzadas.lab1.entities.ClientEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import java.util.List;
 
+import java.util.List;
 
 @Repository
 public class ClientRepository implements ClientRepositoryInt {
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<ClientEntity> findAll() {
-        String sql = "SELECT * FROM clients";
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new ClientEntity(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("rut"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("address")
-                )
-        );
-    }
-
     public void save(ClientEntity client) {
-        String sql = "INSERT INTO clients (name, rut, email, phone, address) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, client.getName(), client.getRut(), client.getEmail(), client.getPhone(), client.getAddress());
+        String sql = "INSERT INTO clients (user_id, name, rut, email, phone, address) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, client.getUserId(), client.getName(), client.getRut(), client.getEmail(), client.getPhone(), client.getAddress());
+
+
     }
 
     public void update(ClientEntity client) {
@@ -42,18 +29,32 @@ public class ClientRepository implements ClientRepositoryInt {
         jdbcTemplate.update(sql, id);
     }
 
-
     public ClientEntity findById(int id) {
         String sql = "SELECT * FROM clients WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) ->
-                new ClientEntity(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("rut"),
-                        rs.getString("email"),
-                        rs.getString("phone"),
-                        rs.getString("address")
-                )
-        );
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
+            ClientEntity client = new ClientEntity();
+            client.setId(rs.getInt("id"));
+            client.setName(rs.getString("name"));
+            client.setRut(rs.getString("rut"));
+            client.setEmail(rs.getString("email"));
+            client.setPhone(rs.getString("phone"));
+            client.setAddress(rs.getString("address"));
+            return client;
+        });
     }
+
+    public List<ClientEntity> findAll() {
+        String sql = "SELECT * FROM clients";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            ClientEntity client = new ClientEntity();
+            client.setId(rs.getInt("id"));
+            client.setName(rs.getString("name"));
+            client.setRut(rs.getString("rut"));
+            client.setEmail(rs.getString("email"));
+            client.setPhone(rs.getString("phone"));
+            client.setAddress(rs.getString("address"));
+            return client;
+        });
+    }
+
 }

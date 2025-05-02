@@ -1,10 +1,11 @@
 package bdavanzadas.lab1.repositories;
 
 import java.util.List;
-import java.util.Map;
 
+
+import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.OrdersEntity;
-import bdavanzadas.lab1.entities.ClientEntity;
+
 
 public interface OrdersRepositoryInt {
 
@@ -15,6 +16,6 @@ public interface OrdersRepositoryInt {
     OrdersEntity findById(int id);
     List<OrdersEntity> findByClientId(int clientId);
     List<OrdersEntity> findByDealerId(int dealerId);
-    Map<String, Object> getTopSpender();
+    TopSpenderDTO getTopSpender();
 
 }

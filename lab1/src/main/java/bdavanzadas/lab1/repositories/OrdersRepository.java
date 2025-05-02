@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.repositories;
 
+import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,7 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
-    public Map<String, Object> getTopSpender() {
+    public TopSpenderDTO getTopSpender() {
         String sql = """
         SELECT c.id, c.name, c.rut, c.email, c.phone, c.address, SUM(o.total_price) AS total_spent
         FROM orders o
@@ -104,15 +105,15 @@ public class OrdersRepository implements OrdersRepositoryInt {
     """;
 
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("id", rs.getInt("id"));
-            result.put("name", rs.getString("name"));
-            result.put("rut", rs.getString("rut"));
-            result.put("email", rs.getString("email"));
-            result.put("phone", rs.getString("phone"));
-            result.put("address", rs.getString("address"));
-            result.put("totalSpent", rs.getDouble("total_spent"));
-            return result;
+            TopSpenderDTO topSpender = new TopSpenderDTO();
+            topSpender.setId(rs.getInt("id"));
+            topSpender.setName(rs.getString("name"));
+            topSpender.setRut(rs.getString("rut"));
+            topSpender.setEmail(rs.getString("email"));
+            topSpender.setPhone(rs.getString("phone"));
+            topSpender.setAddress(rs.getString("address"));
+            topSpender.setTotalSpent(rs.getDouble("total_spent"));
+            return topSpender;
         });
     }
 
