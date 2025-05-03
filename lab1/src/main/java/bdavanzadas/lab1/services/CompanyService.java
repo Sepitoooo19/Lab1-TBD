@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.services;
 
+import bdavanzadas.lab1.dtos.FailedDeliveriesCompanyDTO;
 import bdavanzadas.lab1.entities.CompanyEntity;
 import bdavanzadas.lab1.repositories.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,9 @@ public class CompanyService {
     @Transactional
     public void deleteCompany(int id) {
         companyRepository.delete(id);
+    }
+
+    public List<FailedDeliveriesCompanyDTO> getCompaniesWithMostFailedDeliveries() {
+        return companyRepository.getCompaniesWithMostFailedDeliveries();
     }
 }

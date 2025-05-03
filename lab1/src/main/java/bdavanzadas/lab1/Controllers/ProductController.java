@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
@@ -31,5 +31,7 @@ public class ProductController {
     @GetMapping("/categorias")
     public List<String> findallCategories(){return service.findallCategories();}
     @GetMapping("/ObtenePedidosPorCategoria")
-    public List<List<ProductEntity>> getMostOrderProducts(){return service.getTopProductsByCategory();}
+    public List<List<ProductEntity>> getMostOrderProducts() {
+        return service.getTopProductsByCategory();
+    }
 }
