@@ -16,5 +16,6 @@ public class DealerEntity {
     private String vehicle;
     private String plate;
 
+
     private int userId; // Relación con UserEntity
 }

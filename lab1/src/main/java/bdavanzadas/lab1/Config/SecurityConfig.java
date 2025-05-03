@@ -32,11 +32,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register",
-                                        "/auth/login",
-                                        "/clients/**",
-                                        "/dealers/**",
-                                "/orders/**").permitAll() // Permitir acceso público para registrar usuarios
+                        .requestMatchers("/auth/**", "/clients/**", "/orders/**","/paymentmethod/**","/companies/**","/products/**").permitAll() // 🔓 ESTO PERMITE /auth/login
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -46,7 +42,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Usa BCrypt para codificar contraseñas
+        return new BCryptPasswordEncoder();
     }
 
     public OncePerRequestFilter jwtFilter() {

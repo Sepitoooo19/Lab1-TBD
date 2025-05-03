@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDetailsEntity {
-
     private int id;
     private int orderId;
     private String paymentMethod;

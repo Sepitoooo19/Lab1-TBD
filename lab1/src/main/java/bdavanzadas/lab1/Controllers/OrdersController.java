@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.Controllers;
 
+import bdavanzadas.lab1.dtos.CrearOrdenDTO;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
@@ -36,7 +37,6 @@ public class OrdersController {
             return ResponseEntity.notFound().build();
         }
     }
-
     @PostMapping
     public ResponseEntity<Void> addOrder(@RequestBody OrdersEntity order) {
         ordersService.addOrder(order);
@@ -72,7 +72,11 @@ public class OrdersController {
         return ResponseEntity.ok(topSpender);
     }
 
-
-
-
+    @PostMapping("/CrearConProductos")
+    public ResponseEntity<Void> addOrderWithProducts(@RequestBody CrearOrdenDTO or) {
+        OrdersEntity order=or.getO();
+        List<Integer> product=or.getProducts();
+        ordersService.createOrderWithProducts(order,product);
+        return ResponseEntity.noContent().build();
+    }
 }

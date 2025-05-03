@@ -10,7 +10,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrdersEntity {
-
     private int id;
     private Date orderDate;
     private Date deliveryDate;

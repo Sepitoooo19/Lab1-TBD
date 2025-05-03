@@ -21,6 +21,7 @@ public class PaymentMethodService {
     public PaymentMethodEntity getPaymentMethodById(int id) {
         return paymentMethodRepository.findById(id);
     }
+
     @Transactional(readOnly = true)
     public PaymentMethodEntity getPaymentMethodByType(String type) {
         return paymentMethodRepository.findByType(type);

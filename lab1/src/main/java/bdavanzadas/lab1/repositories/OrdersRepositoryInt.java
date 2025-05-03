@@ -5,6 +5,7 @@ import java.util.List;
 
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.OrdersEntity;
+import bdavanzadas.lab1.entities.ProductEntity;
 
 
 public interface OrdersRepositoryInt {
@@ -17,5 +18,5 @@ public interface OrdersRepositoryInt {
     List<OrdersEntity> findByClientId(int clientId);
     List<OrdersEntity> findByDealerId(int dealerId);
     TopSpenderDTO getTopSpender();
-
+    void saveOrderProducts(int orderId, List<Integer> productIds);
 }

@@ -12,5 +12,6 @@ public class ProductEntity {
     private String name;
     private int stock;
     private float price;
+    private String category;
     private String proovedor;
 }

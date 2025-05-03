@@ -15,5 +15,6 @@ public class ClientEntity {
     private String phone;
     private String address;
 
+
     private int userId; // Relación con UserEntity
 }

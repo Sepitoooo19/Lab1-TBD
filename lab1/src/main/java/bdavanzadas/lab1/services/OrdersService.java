@@ -2,6 +2,7 @@ package bdavanzadas.lab1.services;
 
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
+import bdavanzadas.lab1.entities.ProductEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import bdavanzadas.lab1.entities.OrdersEntity;
@@ -61,4 +62,18 @@ public class OrdersService {
     public TopSpenderDTO getTopSpender() {
         return ordersRepository.getTopSpender();
     }
+
+    // Método para crear una orden y asociar productos
+    @Transactional
+    public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
+        // Guardar la orden (sin obtener el ID aquí, ya que no lo necesitas en este método)
+        ordersRepository.save(order);
+
+        // Recuperar el ID de la orden recién insertada
+        int orderId = ordersRepository.getLastInsertedOrderId();
+
+        // Guardar la relación entre la orden y los productos
+        ordersRepository.saveOrderProducts(orderId, productIds);
+    }
+
 }

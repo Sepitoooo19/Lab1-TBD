@@ -53,6 +53,7 @@ public class PaymentMethodRepostitory {
         jdbcTemplate.update(sql, p.getType(), p.getId());
     }
 
+
     //DELETE
     public void deleteById(int id) {
         String sql = "DELETE FROM payment_method WHERE id = ?";

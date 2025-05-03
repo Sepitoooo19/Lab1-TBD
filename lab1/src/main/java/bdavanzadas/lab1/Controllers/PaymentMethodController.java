@@ -21,6 +21,7 @@ public class PaymentMethodController {
         return service.getallPaymentMethods();
     }
 
+
     @GetMapping("/obtenerbyid/{id}")
     public PaymentMethodEntity getByName(@PathVariable int id) {
         return service.getPaymentMethodById(id);

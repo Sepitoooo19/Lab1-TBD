@@ -11,7 +11,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatingEntity {
-
     private int id;
     private int rating;
     private String comment;

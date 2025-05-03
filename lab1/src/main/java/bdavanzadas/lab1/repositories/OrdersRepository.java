@@ -3,6 +3,7 @@ package bdavanzadas.lab1.repositories;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
+import bdavanzadas.lab1.entities.ProductEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -37,6 +38,16 @@ public class OrdersRepository implements OrdersRepositoryInt {
         jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getTotalPrice());
     }
 
+    // Método para guardar la relación entre la orden y los productos
+    public void saveOrderProducts(int orderId, List<Integer> productIds) {
+        String sql = "INSERT INTO order_products (order_id, product_id) VALUES (?, ?)";
+
+        // Insertar la relación entre la orden y los productos utilizando los IDs
+        for (Integer productId : productIds) {
+            jdbcTemplate.update(sql, orderId, productId);
+        }
+    }
+
     public void update(OrdersEntity order) {
         String sql = "UPDATE orders SET order_date = ?, delivery_date = ?, status = ?, client_id = ?, total_price = ? WHERE id = ?";
         jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getTotalPrice(), order.getId());
@@ -45,6 +56,12 @@ public class OrdersRepository implements OrdersRepositoryInt {
     public void delete(int id) {
         String sql = "DELETE FROM orders WHERE id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    // Método para obtener el último ID insertado (order_id)
+    public int getLastInsertedOrderId() {
+        String sql = "SELECT LAST_INSERT_ID()";
+        return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
     public OrdersEntity findById(int id) {
@@ -84,7 +101,6 @@ public class OrdersRepository implements OrdersRepositoryInt {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
-                        rs.getInt("products"),
                         rs.getDouble("total_price")
                 )
         );
@@ -112,6 +128,19 @@ public class OrdersRepository implements OrdersRepositoryInt {
             topSpender.setTotalSpent(rs.getDouble("total_spent"));
             return topSpender;
         });
+    }
+    public List<OrdersEntity> findOrdersByMonth(int month, int year) {
+        String sql = "SELECT * FROM orders WHERE EXTRACT(MONTH FROM order_date) = ? AND EXTRACT(YEAR FROM order_date) = ?";
+        return jdbcTemplate.query(sql, new Object[]{month, year}, (rs, rowNum) ->
+                new OrdersEntity(
+                        rs.getInt("id"),
+                        rs.getDate("order_date"),
+                        rs.getDate("delivery_date"),
+                        rs.getString("status"),
+                        rs.getInt("client_id"),
+                        rs.getDouble("total_price")
+                )
+        );
     }
 
 }

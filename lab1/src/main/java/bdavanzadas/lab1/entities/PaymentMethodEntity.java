@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class PaymentMethodEntity {
     int id;
     private String type;
+
 }

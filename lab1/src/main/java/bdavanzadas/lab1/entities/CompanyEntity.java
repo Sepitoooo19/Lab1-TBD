@@ -12,4 +12,5 @@ public class CompanyEntity {
     private String name;
     private String email;
     private String phone;
+
 }
