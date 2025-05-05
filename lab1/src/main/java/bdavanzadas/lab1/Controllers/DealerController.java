@@ -61,7 +61,10 @@ public class DealerController {
         }
     }
 
-
+    @GetMapping("/MejoresRepartidores")
+    public List<List<Object>> obtenerMejoresRepartidores(){
+        return dealerService.obtenerTop3Repartidores();
+    }
 
 
 }

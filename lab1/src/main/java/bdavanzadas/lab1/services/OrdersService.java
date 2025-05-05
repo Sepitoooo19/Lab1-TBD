@@ -2,23 +2,25 @@ package bdavanzadas.lab1.services;
 
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
+import bdavanzadas.lab1.entities.DealerEntity;
 import bdavanzadas.lab1.entities.ProductEntity;
+import bdavanzadas.lab1.repositories.DealerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class OrdersService {
-
-    private final OrdersRepository ordersRepository;
-
-    public OrdersService(OrdersRepository ordersRepository) {
-        this.ordersRepository = ordersRepository;
-    }
+    @Autowired
+    private OrdersRepository ordersRepository;
+    @Autowired
+    private DealerService dealerService;
 
     @Transactional(readOnly = true)
     public List<OrdersEntity> getAllOrders() {
@@ -76,4 +78,29 @@ public class OrdersService {
         ordersRepository.saveOrderProducts(orderId, productIds);
     }
 
+    //RF 04: tiempo promedio entre entrega y pedido por repartidor
+    @Transactional
+    public List<List<Object>> obtenerPromedioTiempoEntregaPorRepartidor() {
+        // Lista donde se almacenarán los resultados
+        List<List<Object>> result = new ArrayList<>();
+
+        // Obtener todos los repartidores
+        List<DealerEntity> dealers = dealerService.getAllDealers();  // Asegúrate de tener este método en DealerService
+
+        // Recorrer cada repartidor
+        for (DealerEntity dealer : dealers) {
+            // Obtener el tiempo promedio de entrega para cada repartidor
+            float tiempoPromedio = ordersRepository.obtenerTiempoPromedioHoras(dealer.getId());
+
+            // Crear una sublista con el ID del repartidor y su tiempo promedio de entrega
+            List<Object> dealerResult = new ArrayList<>();
+            dealerResult.add(dealer.getId());  // ID del repartidor
+            dealerResult.add(tiempoPromedio);  // Tiempo promedio en horas
+
+            // Añadir la sublista a la lista de resultados
+            result.add(dealerResult);
+        }
+
+        return result;
+    }
 }

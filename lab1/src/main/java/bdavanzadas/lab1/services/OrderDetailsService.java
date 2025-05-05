@@ -42,6 +42,10 @@ public class OrderDetailsService {
         return orderDetailsRepository.findByOrderId(orderId);
     }
 
+    @Transactional(readOnly = true)
+    public String findPaymentmethodUrgentOrders(){
+        return orderDetailsRepository.findPaymentmethodUrgentOrders();
+    }
 
 
 

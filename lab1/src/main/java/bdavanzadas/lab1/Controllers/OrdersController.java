@@ -79,4 +79,8 @@ public class OrdersController {
         ordersService.createOrderWithProducts(order,product);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/ObtenerPromedioEntregas")
+    public List<List<Object>> obtenerPromedioTiempoEntregaPorRepartidor(){
+        return  ordersService.obtenerPromedioTiempoEntregaPorRepartidor();
+    }
 }

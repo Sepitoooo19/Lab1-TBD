@@ -63,4 +63,8 @@ public class OrderDetailsController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/ObtenerMediodepagoUrgente")
+    public String obtenerMedioPagoUrgente(){
+        return orderDetailsService.findPaymentmethodUrgentOrders();
+    }
 }

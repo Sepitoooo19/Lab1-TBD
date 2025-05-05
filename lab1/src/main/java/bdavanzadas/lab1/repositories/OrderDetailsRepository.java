@@ -1,8 +1,11 @@
 package bdavanzadas.lab1.repositories;
 import bdavanzadas.lab1.entities.OrderDetailsEntity;
+import bdavanzadas.lab1.entities.PaymentMethodEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.security.PublicKey;
 import java.util.List;
 
 
@@ -67,5 +70,19 @@ public class OrderDetailsRepository implements OrderDetailsRepositoryInt {
                         rs.getDouble("price")
                 )
         );
+    }
+
+    //RF 06: medio de pago en pedidos urgentes
+    public String findPaymentmethodUrgentOrders() {
+        String sql = "SELECT od.payment_method " +
+                "FROM order_details od " +
+                "JOIN orders o ON o.id = od.order_id " +
+                "WHERE o.status = 'urgente' " +
+                "GROUP BY od.payment_method " +
+                "ORDER BY COUNT(*) DESC " +
+                "LIMIT 1";
+
+        // Ejecuta la consulta y retorna solo el tipo de pago más utilizado
+        return jdbcTemplate.queryForObject(sql, String.class);
     }
 }

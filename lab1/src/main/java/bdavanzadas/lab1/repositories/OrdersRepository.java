@@ -18,6 +18,8 @@ public class OrdersRepository implements OrdersRepositoryInt {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private DealerRepository dealerRepository;
 
     public List<OrdersEntity> findAll() {
         String sql = "SELECT * FROM orders";
@@ -28,14 +30,15 @@ public class OrdersRepository implements OrdersRepositoryInt {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
                         rs.getDouble("total_price")
                 )
         );
     }
 
     public void save(OrdersEntity order) {
-        String sql = "INSERT INTO orders (order_date, delivery_date, status, client_id, , total_price) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getTotalPrice());
+        String sql = "INSERT INTO orders (order_date, delivery_date, status, client_id,dealer_id , total_price) VALUES (?, ?, ?, ?, ?,?)";
+        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(),order.getDealerId() ,order.getTotalPrice());
     }
 
     // Método para guardar la relación entre la orden y los productos
@@ -49,8 +52,8 @@ public class OrdersRepository implements OrdersRepositoryInt {
     }
 
     public void update(OrdersEntity order) {
-        String sql = "UPDATE orders SET order_date = ?, delivery_date = ?, status = ?, client_id = ?, total_price = ? WHERE id = ?";
-        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(), order.getTotalPrice(), order.getId());
+        String sql = "UPDATE orders SET order_date = ?, delivery_date = ?, status = ?, client_id = ?,dealer_id= ?, total_price = ? WHERE id = ?";
+        jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(),order.getDealerId(), order.getTotalPrice(), order.getId());
     }
 
     public void delete(int id) {
@@ -73,6 +76,7 @@ public class OrdersRepository implements OrdersRepositoryInt {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
                         rs.getDouble("total_price")
                 )
         );
@@ -87,6 +91,7 @@ public class OrdersRepository implements OrdersRepositoryInt {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
                         rs.getDouble("total_price")
                 )
         );
@@ -101,6 +106,7 @@ public class OrdersRepository implements OrdersRepositoryInt {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
                         rs.getDouble("total_price")
                 )
         );
@@ -138,9 +144,16 @@ public class OrdersRepository implements OrdersRepositoryInt {
                         rs.getDate("delivery_date"),
                         rs.getString("status"),
                         rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
                         rs.getDouble("total_price")
                 )
         );
+    }
+
+    //RF 04: tiempo promedio entre entrega y pedido por repartidor
+    public float obtenerTiempoPromedioHoras(int id) {
+        String sql = "SELECT AVG(EXTRACT(EPOCH FROM (delivery_date - order_date)) / 3600) FROM orders WHERE dealer_id = ? AND delivery_date IS NOT NULL AND order_date IS NOT NULL";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, Float.class);
     }
 
 }

@@ -56,4 +56,10 @@ public class DealerRepository  implements DealerRepositoryInt {
             return dealer;
         });
     }
+
+    //RF 05 TOP 3 MEJORES REPARTIDORES
+    public Float puntuacionProm(int id){
+        String sql = "SELECT AVG(rating) FROM rating WHERE dealer_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, Float.class);
+    }
 }

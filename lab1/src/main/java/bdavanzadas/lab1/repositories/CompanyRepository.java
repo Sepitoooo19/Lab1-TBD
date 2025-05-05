@@ -63,13 +63,13 @@ public class CompanyRepository {
             FROM 
                 orders o
             JOIN 
-                dealers d ON o.client_id = d.id
+                dealers d ON o.dealer_id = d.id
             JOIN 
                 company_driver cd ON d.id = cd.dealer_id
             JOIN 
                 companies c ON cd.company_id = c.id
             WHERE 
-                o.status = 'cancelado' -- Cambia esto si el estado de las entregas fallidas es diferente
+                o.status = 'cancelado'
             GROUP BY 
                 c.id, c.name
             ORDER BY 
