@@ -17,4 +17,5 @@ public class RatingEntity {
     private Date date;
     private int clientId;
     private int dealerId;
+    private int orderId;
 }

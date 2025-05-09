@@ -23,19 +23,21 @@ public class RatingRepository implements RatingRepositoryInt {
                         rs.getString("comment"),
                         rs.getDate("date"),
                         rs.getInt("client_id"),
-                        rs.getInt("dealer_id")
+                        rs.getInt("dealer_id"),
+                        rs.getInt("order_id")
+
                 )
         );
     }
 
     public void save(RatingEntity rating) {
         String sql = "INSERT INTO rating (rating, comment, date, client_id, dealer_id) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, rating.getRating(), rating.getComment(), rating.getDate(), rating.getClientId(), rating.getDealerId());
+        jdbcTemplate.update(sql, rating.getRating(), rating.getComment(), rating.getDate(), rating.getClientId(), rating.getDealerId(), rating.getOrderId());
     }
 
     public void update(RatingEntity rating) {
         String sql = "UPDATE rating SET rating = ?, comment = ?, date = ?, client_id = ?, dealer_id = ? WHERE id = ?";
-        jdbcTemplate.update(sql, rating.getRating(), rating.getComment(), rating.getDate(), rating.getClientId(), rating.getDealerId(), rating.getId());
+        jdbcTemplate.update(sql, rating.getRating(), rating.getComment(), rating.getDate(), rating.getClientId(), rating.getDealerId(), rating.getId(), rating.getOrderId());
     }
 
     public void delete(int id) {
@@ -52,7 +54,8 @@ public class RatingRepository implements RatingRepositoryInt {
                         rs.getString("comment"),
                         rs.getDate("date"),
                         rs.getInt("client_id"),
-                        rs.getInt("dealer_id")
+                        rs.getInt("dealer_id"),
+                        rs.getInt("order_id")
                 )
         );
     }
@@ -66,7 +69,8 @@ public class RatingRepository implements RatingRepositoryInt {
                         rs.getString("comment"),
                         rs.getDate("date"),
                         rs.getInt("client_id"),
-                        rs.getInt("dealer_id")
+                        rs.getInt("dealer_id"),
+                        rs.getInt("order_id")
                 )
         );
     }
@@ -80,7 +84,8 @@ public class RatingRepository implements RatingRepositoryInt {
                         rs.getString("comment"),
                         rs.getDate("date"),
                         rs.getInt("client_id"),
-                        rs.getInt("dealer_id")
+                        rs.getInt("dealer_id"),
+                        rs.getInt("order_id")
                 )
         );
     }

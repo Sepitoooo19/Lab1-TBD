@@ -13,5 +13,5 @@ public class ProductEntity {
     private int stock;
     private float price;
     private String category;
-    private String proovedor;
+    private int companyId;
 }

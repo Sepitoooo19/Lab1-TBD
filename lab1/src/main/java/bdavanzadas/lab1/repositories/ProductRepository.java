@@ -22,7 +22,7 @@ public class ProductRepository {
                   rs.getInt("stock"),
                   rs.getFloat("price"),
                   rs.getString("category"),
-                  rs.getString("supplier")));
+                  rs.getInt("companyId")));
     }
     //find by id
    public ProductEntity findbyid(int id){
@@ -34,17 +34,17 @@ public class ProductRepository {
                    rs.getInt("stock"),
                    rs.getFloat("price"),
                        rs.getString("category"),
-                   rs.getString("supplier")));
+                   rs.getInt("companyId")));
    }
    //SAVE
     public void save(ProductEntity p){
        String sql="INSERTO INTO products (name,stock,price,category,supplier) VALUES (?,?,?,?,?)";
-       jdbcTemplate.update(sql,p.getName(),p.getStock(),p.getPrice(),p.getProovedor());
+       jdbcTemplate.update(sql,p.getName(),p.getStock(),p.getPrice(),p.getCompanyId());
     }
     //UPDATE
     public void update(ProductEntity p){
        String sql="UPDATE products SET name=?,stock=?,price=?,category=?,supplier=? WHERE id=?";
-        jdbcTemplate.update(sql,p.getName(),p.getStock(),p.getPrice(),p.getCategory(),p.getProovedor(),p.getId());
+        jdbcTemplate.update(sql,p.getName(),p.getStock(),p.getPrice(),p.getCategory(),p.getCompanyId(),p.getId());
     }
 
     //DELETE
@@ -63,7 +63,7 @@ public class ProductRepository {
                   rs.getInt("stock"),
                   rs.getFloat("price"),
                   rs.getString("category"),
-                  rs.getString("supplier")));
+                  rs.getInt("companyId")));
     }
 
     //find by categoria
@@ -76,7 +76,7 @@ public class ProductRepository {
                    rs.getInt("stock"),
                    rs.getFloat("price"),
                    rs.getString("category"),
-                   rs.getString("supplier")));
+                       rs.getInt("companyId")));
     }
 
     public List<String> findAllCategories() {
@@ -104,7 +104,7 @@ public class ProductRepository {
                         0, // Puedes obtener estos valores si los necesitas
                         0,
                         category, // Pasamos la categoría directamente
-                        "" // Proveedor (puedes obtenerlo si es necesario)
+                        0 // Puedes obtener estos valores si los necesitas
                 )
         );
     }
