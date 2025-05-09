@@ -83,4 +83,10 @@ public class OrdersController {
     public List<List<Object>> obtenerPromedioTiempoEntregaPorRepartidor(){
         return  ordersService.obtenerPromedioTiempoEntregaPorRepartidor();
     }
+
+    @PutMapping("/{id}/deliver")
+    public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
+        ordersService.markAsDelivered(id);
+        return ResponseEntity.ok("Pedido marcado como entregado");
+    }
 }

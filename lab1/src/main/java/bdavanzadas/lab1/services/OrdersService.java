@@ -8,8 +8,10 @@ import bdavanzadas.lab1.repositories.DealerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,8 @@ public class OrdersService {
     private OrdersRepository ordersRepository;
     @Autowired
     private DealerService dealerService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Transactional(readOnly = true)
     public List<OrdersEntity> getAllOrders() {
@@ -102,5 +106,10 @@ public class OrdersService {
         }
 
         return result;
+    }
+
+    public void markAsDelivered(int orderId) {
+        String sql = "UPDATE orders SET status = 'ENTREGADO' WHERE id = ?";
+        jdbcTemplate.update(sql, orderId);
     }
 }
