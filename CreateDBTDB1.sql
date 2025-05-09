@@ -1,110 +1,132 @@
-
 -- ========================
 -- MAIN TABLES
 -- ========================
 
-CREATE TABLE Clients (
+-- Tabla: users
+CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    address VARCHAR(255),
-    email VARCHAR(100),
-    phone VARCHAR(20),
-	rut VARCHAR(20)
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) CHECK (role IN ('ADMIN', 'CLIENT', 'DEALER')) NOT NULL
 );
 
-CREATE TABLE Dealers (
+-- Tabla: companies
+CREATE TABLE companies (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-	rut VARCHAR(20),
-    email VARCHAR(100),
-    phone VARCHAR(20),
-    vehicle VARCHAR(50),
-    plate VARCHAR(20)
-);
-
-CREATE TABLE Products (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    stock INT,
-    price FLOAT,
-    category VARCHAR(100),
-    supplier VARCHAR(100)
-);
-
-CREATE TABLE Orders (
-    id SERIAL PRIMARY KEY,
-    order_date TIMESTAMP,
-	delivery_date TIMESTAMP,
-    status VARCHAR(50),
-    total_price INT,
-	dealer_id INT,
-	client_id INT,
-    FOREIGN KEY (client_id) REFERENCES Clients(id),
-	FOREIGN KEY(dealer_id) REFERENCES Dealers(id)
-);
-
-CREATE TABLE Order_Products (
-    product_id INT,
-    order_id INT,
-    PRIMARY KEY (product_id, order_id),
-    FOREIGN KEY (product_id) REFERENCES Products(id),
-    FOREIGN KEY (order_id) REFERENCES Orders(id)
-);
-
--- ========================
--- COMPANIES AND DRIVERS
--- ========================
-
-
-
-CREATE TABLE Companies (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     email VARCHAR(100),
     phone VARCHAR(20)
 );
 
-CREATE TABLE Company_Driver (
-    company_id INT,
-    dealer_id INT,
-    PRIMARY KEY (company_id, dealer_id),
-    FOREIGN KEY (company_id) REFERENCES Companies(id),
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(id)
+-- Tabla: payment_methods
+CREATE TABLE payment_methods (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL
 );
 
 -- ========================
--- ADDITIONAL TABLES
+-- USERS (EXTENDED PROFILES)
 -- ========================
 
-CREATE TABLE Rating (
+-- Tabla: clients
+CREATE TABLE clients (
     id SERIAL PRIMARY KEY,
-    dealer_id INT,
-    date DATE,
-    client_id INT,
-    rating INT,
-    comment TEXT,
-    FOREIGN KEY (dealer_id) REFERENCES Dealers(id),
-    FOREIGN KEY (client_id) REFERENCES Clients(id)
+    name VARCHAR(100) NOT NULL,
+    rut VARCHAR(20),
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    user_id INT UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE Payment_Method (
+-- Tabla: dealers
+CREATE TABLE dealers (
     id SERIAL PRIMARY KEY,
-    type VARCHAR(50)
+    rut VARCHAR(20),
+    name VARCHAR(100),
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    vehicle VARCHAR(50),
+    plate VARCHAR(20),
+    user_id INT UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE Order_Details (
-    id SERIAL PRIMARY KEY,
-    order_id INT,
-    payment_method VARCHAR(20),
-    total_products INT,
-    price INT,
-    FOREIGN KEY (order_id) REFERENCES Orders(id)
-);
+-- ========================
+-- RELATIONAL TABLES (N:N)
+-- ========================
 
-CREATE TABLE Company_PaymentMethod (
+-- Relación empresas-medios de pago
+CREATE TABLE company_payment_methods (
     company_id INT,
     payment_method_id INT,
     PRIMARY KEY (company_id, payment_method_id),
-    FOREIGN KEY (company_id) REFERENCES Companies(id),
-    FOREIGN KEY (payment_method_id) REFERENCES Payment_Method(id)
+    FOREIGN KEY (company_id) REFERENCES companies(id),
+    FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)
+);
+
+-- Relación pedidos-productos
+CREATE TABLE order_products (
+    order_id INT,
+    product_id INT,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- ========================
+-- PRODUCTS & ORDERS
+-- ========================
+
+-- Tabla: products
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    stock INT NOT NULL,
+    price FLOAT NOT NULL,
+    category VARCHAR(50),
+    company_id INT,
+    FOREIGN KEY (company_id) REFERENCES companies(id)
+);
+
+-- Tabla: orders
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    order_date DATE,
+    delivery_date DATE,
+    status VARCHAR(50),
+    client_id INT,
+    dealer_id INT,
+    total_price FLOAT,
+    FOREIGN KEY (client_id) REFERENCES clients(id),
+    FOREIGN KEY (dealer_id) REFERENCES dealers(id)
+);
+
+-- Tabla: order_details (1:1 con orders)
+CREATE TABLE order_details (
+    id SERIAL PRIMARY KEY,
+    order_id INT UNIQUE,
+    payment_method VARCHAR(50),
+    total_products INT,
+    price FLOAT,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+
+-- ========================
+-- RATINGS
+-- ========================
+
+-- Tabla: ratings
+CREATE TABLE ratings (
+    id SERIAL PRIMARY KEY,
+    rating INT NOT NULL,
+    comment TEXT,
+    date DATE,
+    client_id INT,
+    dealer_id INT,
+    order_id INT,
+    FOREIGN KEY (client_id) REFERENCES clients(id),
+    FOREIGN KEY (dealer_id) REFERENCES dealers(id),
+    FOREIGN KEY (order_id) REFERENCES orders(id)
 );
