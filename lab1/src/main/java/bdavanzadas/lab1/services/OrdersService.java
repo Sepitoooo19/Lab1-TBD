@@ -69,6 +69,7 @@ public class OrdersService {
         return ordersRepository.getTopSpender();
     }
 
+    /*
     // Método para crear una orden y asociar productos
     @Transactional
     public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
@@ -80,6 +81,21 @@ public class OrdersService {
 
         // Guardar la relación entre la orden y los productos
         ordersRepository.saveOrderProducts(orderId, productIds);
+    }*/
+
+    // Método para crear una orden y asociar productos mediante procedimiento almacenado
+    // * USAR ESTA FUNCION EN VEZ DE createOrderWithProducts?
+    public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
+        // llama al procedimiento almacenado
+        String sql = "CALL register_order_with_products(?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql,
+                order.getOrderDate(),
+                order.getStatus(),
+                order.getClientId(),
+                order.getDealerId(),
+                order.getTotalPrice(),
+                productIds.toArray(new Integer[0])
+        );
     }
 
     //RF 04: tiempo promedio entre entrega y pedido por repartidor
