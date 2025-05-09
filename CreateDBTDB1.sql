@@ -128,3 +128,24 @@ CREATE TABLE order_products (
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+-- Triggers:
+-- Insertar automáticamente la fecha de entrega al marcar como entregado.
+
+-- Trigger function
+CREATE OR REPLACE FUNCTION set_delivery_date_when_delivered()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.status = 'ENTREGADO' AND NEW.delivery_date IS NULL THEN
+        NEW.delivery_date := NOW();
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger
+CREATE TRIGGER trg_set_delivery_date
+    BEFORE UPDATE ON orders
+    FOR EACH ROW
+    WHEN (OLD.status IS DISTINCT FROM NEW.status)
+EXECUTE FUNCTION set_delivery_date_when_delivered();
