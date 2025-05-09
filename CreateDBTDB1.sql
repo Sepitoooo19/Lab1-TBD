@@ -129,10 +129,55 @@ CREATE TABLE order_products (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- Triggers:
--- Insertar automáticamente la fecha de entrega al marcar como entregado.
+-- ========================
+-- PROCEDIMIENTOS ALMACENADOS
+-- ========================
 
--- Trigger function
+-- 1 y 3 Registrar un pedido completo y descuenta el stock.
+CREATE OR REPLACE PROCEDURE register_order_with_products(
+    p_order_date TIMESTAMP,
+    p_status VARCHAR,
+    p_client_id INT,
+    p_dealer_id INT,
+    p_total_price FLOAT,
+    p_product_ids INT[]
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+v_order_id INT;
+    v_product_id INT;
+BEGIN
+    -- 1. Insert order
+INSERT INTO orders (order_date, status, client_id, dealer_id, total_price)
+VALUES (p_order_date, p_status, p_client_id, p_dealer_id, p_total_price)
+    RETURNING id INTO v_order_id;
+
+-- 2. Loop through product IDs
+FOREACH v_product_id IN ARRAY p_product_ids LOOP
+        -- a) Insert into order_products
+        INSERT INTO order_products (order_id, product_id)
+        VALUES (v_order_id, v_product_id);
+
+        -- b) Reduce stock
+UPDATE products
+SET stock = stock - 1
+WHERE id = v_product_id AND stock > 0;
+
+-- Optional: raise exception if stock is insufficient
+IF NOT FOUND THEN
+            RAISE EXCEPTION 'Insufficient stock for product ID %', v_product_id;
+END IF;
+END LOOP;
+END;
+$$;
+
+-- ========================
+-- TRIGGERS
+-- ========================
+
+-- 1. Insertar automáticamente la fecha de entrega al marcar como entregado.
+-- Trigger function:
 CREATE OR REPLACE FUNCTION set_delivery_date_when_delivered()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -143,7 +188,7 @@ RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger
+-- Trigger:
 CREATE TRIGGER trg_set_delivery_date
     BEFORE UPDATE ON orders
     FOR EACH ROW
