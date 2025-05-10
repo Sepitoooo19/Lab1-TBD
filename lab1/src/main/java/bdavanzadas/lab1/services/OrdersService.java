@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
 
+import bdavanzadas.lab1.services.UserService;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,9 @@ public class OrdersService {
     private DealerService dealerService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserService userService;
 
     @Transactional(readOnly = true)
     public List<OrdersEntity> getAllOrders() {
@@ -85,9 +90,24 @@ public class OrdersService {
 
     // Método para crear una orden y asociar productos mediante procedimiento almacenado
     // * USAR ESTA FUNCION EN VEZ DE createOrderWithProducts?
+    @Transactional
     public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
-        // llama al procedimiento almacenado
-        String sql = "CALL register_order_with_products(?, ?, ?, ?, ?, ?)";
+        // Obtener el userId del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+
+        // Obtener el clientId asociado al userId
+        String sql = "SELECT id FROM clients WHERE user_id = ?";
+        Integer clientId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+
+        if (clientId == null) {
+            throw new IllegalArgumentException("No se encontró un cliente asociado al usuario con ID " + userId);
+        }
+
+        // Asignar el clientId a la orden
+        order.setClientId(clientId);
+
+        // Llama al procedimiento almacenado
+        sql = "CALL register_order_with_products(?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 order.getOrderDate(),
                 order.getStatus(),
@@ -144,6 +164,17 @@ public class OrdersService {
     @Transactional(readOnly = true)
     public List<OrdersEntity> findDeliveredOrdersByCompanyId(int companyId) {
         return ordersRepository.findDeliveredOrdersByCompanyId(companyId);
+    }
+
+    @Transactional
+    public void updateOrderStatusByDealerId(int orderId, int dealerId, String newStatus) {
+        ordersRepository.updateOrderStatusByDealerId(orderId, dealerId, newStatus);
+    }
+
+    @Transactional
+    public void updateOrderStatus(int orderId, String newStatus) {
+        String sql = "UPDATE orders SET status = ? WHERE id = ?";
+        jdbcTemplate.update(sql, newStatus, orderId);
     }
 
 }

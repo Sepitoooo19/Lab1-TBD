@@ -72,13 +72,16 @@ public class OrdersController {
         return ResponseEntity.ok(topSpender);
     }
 
-    @PostMapping("/CrearConProductos")
-    public ResponseEntity<Void> addOrderWithProducts(@RequestBody CrearOrdenDTO or) {
-        OrdersEntity order=or.getO();
-        List<Integer> product=or.getProducts();
-        ordersService.createOrderWithProducts(order,product);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/create")
+    public ResponseEntity<?> createOrder(@RequestBody OrdersEntity order, @RequestParam List<Integer> productIds) {
+        try {
+            ordersService.createOrderWithProducts(order, productIds);
+            return ResponseEntity.ok("Orden creada exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la orden: " + e.getMessage());
+        }
     }
+
     @GetMapping("/ObtenerPromedioEntregas")
     public List<List<Object>> obtenerPromedioTiempoEntregaPorRepartidor(){
         return  ordersService.obtenerPromedioTiempoEntregaPorRepartidor();
@@ -104,5 +107,29 @@ public class OrdersController {
     public ResponseEntity<List<OrdersEntity>> getDeliveredOrdersByCompanyId(@PathVariable int companyId) {
         List<OrdersEntity> orders = ordersService.findDeliveredOrdersByCompanyId(companyId);
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/dealer/{id}")
+    public ResponseEntity<List<OrdersEntity>> getOrdersByDealerId(@PathVariable int id) {
+        List<OrdersEntity> orders = ordersService.getOrdersByDealerId(id);
+        if (orders != null && !orders.isEmpty()) {
+            return ResponseEntity.ok(orders);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}/dealer/{dealerId}/status")
+    public ResponseEntity<Void> updateOrderStatusByDealerId(
+            @PathVariable int id,
+            @PathVariable int dealerId,
+            @RequestBody Map<String, String> requestBody) {
+        System.out.println("Actualizando estado de la orden...");
+        System.out.println("ID de la orden: " + id);
+        System.out.println("ID del dealer: " + dealerId);
+        System.out.println("Nuevo estado: " + requestBody.get("status"));
+
+        ordersService.updateOrderStatusByDealerId(id, dealerId, requestBody.get("status"));
+        return ResponseEntity.noContent().build();
     }
 }

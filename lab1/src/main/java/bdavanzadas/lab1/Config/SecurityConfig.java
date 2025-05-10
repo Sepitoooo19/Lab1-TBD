@@ -58,11 +58,12 @@ public class SecurityConfig {
 
                     // Validar el token
                     if (jwtUtil.validateToken(token)) {
-                        // Extraer el rol del token
+                        // Extraer el rol y el ID del usuario del token
                         String role = jwtUtil.extractRole(token);
+                        Long userId = jwtUtil.extractUserId(token); // Extraer el ID del usuario
 
-                        // Configurar el contexto de seguridad con el rol
-                        var auth = new UsernamePasswordAuthenticationToken(role, null, Collections.singletonList(() -> role));
+                        // Configurar el contexto de seguridad con el ID del usuario y el rol
+                        var auth = new UsernamePasswordAuthenticationToken(userId, null, Collections.singletonList(() -> role));
                         SecurityContextHolder.getContext().setAuthentication(auth);
                     }
                 }

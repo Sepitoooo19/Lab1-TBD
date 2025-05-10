@@ -71,8 +71,8 @@ public class AuthController {
         // Validar las credenciales del usuario
         UserEntity user = userService.validateCredentials(username, password);
         if (user != null) {
-            // Generar el token JWT
-            String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+            // Generar el token JWT con el username, role y userId
+            String token = jwtUtil.generateToken(user.getUsername(), user.getRole(), (long) user.getId());
 
             // Devolver el token y el rol en la respuesta
             return ResponseEntity.ok(Map.of(

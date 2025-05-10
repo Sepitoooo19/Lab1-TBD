@@ -216,4 +216,9 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+    public void updateOrderStatusByDealerId(int orderId, int dealerId, String newStatus) {
+        String sql = "UPDATE orders SET status = ? WHERE id = ? AND dealer_id = ?";
+        jdbcTemplate.update(sql, newStatus, orderId, dealerId);
+    }
+
 }
