@@ -101,7 +101,6 @@ public class OrdersService {
 
     // Método para crear una orden y asociar productos mediante procedimiento almacenado
     // * USAR ESTA FUNCION EN VEZ DE createOrderWithProducts?
-    @Transactional
     public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
         // Obtener el userId del usuario autenticado
         Long userId = userService.getAuthenticatedUserId();
@@ -117,15 +116,14 @@ public class OrdersService {
         // Asignar el clientId a la orden
         order.setClientId(clientId);
 
-        // Llama al procedimiento almacenado
-        sql = "CALL register_order_with_products(?, ?, ?, ?, ?, ?)";
+        // Llamar al procedimiento almacenado
+        sql = "CALL register_order_with_products(?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
                 order.getOrderDate(),
                 order.getStatus(),
                 order.getClientId(),
-                order.getDealerId(),
-                order.getTotalPrice(),
-                productIds.toArray(new Integer[0])
+                productIds.toArray(new Integer[0]),
+                order.getDealerId() != null ? order.getDealerId() : null // Pasar null si dealerId es null
         );
     }
 

@@ -44,7 +44,7 @@ public class CompanyRepository {
                         rs.getString("rut"),
                         rs.getString("type"),
                         rs.getInt("deliveries"),
-                        rs.getInt("failedDeliveries"),
+                        rs.getInt("failed_deliveries"),
                         rs.getInt("total_sales")
                 ));
     }

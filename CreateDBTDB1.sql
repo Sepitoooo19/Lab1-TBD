@@ -143,7 +143,7 @@ CREATE OR REPLACE PROCEDURE register_order_with_products(
     p_order_date TIMESTAMP,
     p_status VARCHAR,
     p_client_id INT,
-    p_dealer_id INT,
+    p_dealer_id INT DEFAULT NULL,
     p_total_price FLOAT,
     p_product_ids INT[]
 )

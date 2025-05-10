@@ -15,6 +15,6 @@ public class OrdersEntity {
     private Date deliveryDate;
     private String status;
     private int clientId;
-    private int dealerId;
+    private Integer dealerId;
     private double totalPrice;
 }

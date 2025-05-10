@@ -16,12 +16,21 @@ public class CompanyController {
     private CompanyService service;
 
     @GetMapping
-    public List<CompanyEntity> getAllCompanies() {
+    public ResponseEntity<List<CompanyEntity>> getAllCompanies() {
         List<CompanyEntity> companies = service.getAllCompanies();
-        return companies;
+        return ResponseEntity.ok(companies);
     }
-    @GetMapping("/obtenerporid/{id}")
-    public CompanyEntity getById(@PathVariable int id) {return service.findbyid(id);}
+    @GetMapping("/{id}")
+    public ResponseEntity<CompanyEntity> getCompanyById(@PathVariable int id) {
+        System.out.println("Solicitud recibida para obtener la empresa con ID: " + id);
+        CompanyEntity company = service.findbyid(id);
+        if (company == null) {
+            System.out.println("Empresa no encontrada");
+            return ResponseEntity.notFound().build();
+        }
+        System.out.println("Empresa encontrada: " + company.getName());
+        return ResponseEntity.ok(company);
+    }
     @PostMapping("/crear")
     public void create(@RequestBody CompanyEntity c) {service.saveCompany(c);}
     @PostMapping("/update")
