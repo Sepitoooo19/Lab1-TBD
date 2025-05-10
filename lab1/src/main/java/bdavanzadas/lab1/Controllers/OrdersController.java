@@ -88,5 +88,21 @@ public class OrdersController {
     public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
         ordersService.markAsDelivered(id);
         return ResponseEntity.ok("Pedido marcado como entregado");
+
+
+    }
+
+    // Endpoint para obtener pedidos fallidos por ID de la empresa
+    @GetMapping("/failed/company/{companyId}")
+    public ResponseEntity<List<OrdersEntity>> getFailedOrdersByCompanyId(@PathVariable int companyId) {
+        List<OrdersEntity> orders = ordersService.findFailedOrdersByCompanyId(companyId);
+        return ResponseEntity.ok(orders);
+    }
+
+    // Endpoint para obtener pedidos entregados por ID de la empresa
+    @GetMapping("/delivered/company/{companyId}")
+    public ResponseEntity<List<OrdersEntity>> getDeliveredOrdersByCompanyId(@PathVariable int companyId) {
+        List<OrdersEntity> orders = ordersService.findDeliveredOrdersByCompanyId(companyId);
+        return ResponseEntity.ok(orders);
     }
 }

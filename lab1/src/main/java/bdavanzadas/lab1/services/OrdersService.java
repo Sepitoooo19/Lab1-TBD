@@ -128,4 +128,22 @@ public class OrdersService {
         String sql = "UPDATE orders SET status = 'ENTREGADO' WHERE id = ?";
         jdbcTemplate.update(sql, orderId);
     }
+
+    public void markAsFailed(int orderId) {
+        String sql = "UPDATE orders SET status = 'FALLIDO' WHERE id = ?";
+        jdbcTemplate.update(sql, orderId);
+    }
+
+    // Pedidos fallidos por ID de la empresa
+    @Transactional(readOnly = true)
+    public List<OrdersEntity> findFailedOrdersByCompanyId(int companyId) {
+        return ordersRepository.findFailedOrdersByCompanyId(companyId);
+    }
+
+    // Pedidos entregados por ID de la empresa
+    @Transactional(readOnly = true)
+    public List<OrdersEntity> findDeliveredOrdersByCompanyId(int companyId) {
+        return ordersRepository.findDeliveredOrdersByCompanyId(companyId);
+    }
+
 }

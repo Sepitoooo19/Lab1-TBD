@@ -156,4 +156,64 @@ public class OrdersRepository implements OrdersRepositoryInt {
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, Float.class);
     }
 
+    public List<OrdersEntity> findFailedOrdersByCompanyId(int companyId) {
+        String sql = """
+        SELECT 
+            o.id,
+            o.order_date,
+            o.delivery_date,
+            o.status,
+            o.client_id,
+            o.dealer_id,
+            o.total_price
+        FROM orders o
+        JOIN dealers d ON o.dealer_id = d.id
+        JOIN products p ON d.id = p.company_id
+        JOIN companies c ON p.company_id = c.id
+        WHERE c.id = ? AND o.status = 'FALLIDO'
+    """;
+        return jdbcTemplate.query(sql, new Object[]{companyId}, (rs, rowNum) ->
+                new OrdersEntity(
+                        rs.getInt("id"),
+                        rs.getDate("order_date"),
+                        rs.getDate("delivery_date"),
+                        rs.getString("status"),
+                        rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
+                        rs.getDouble("total_price")
+                )
+        );
+    }
+
+
+
+    public List<OrdersEntity> findDeliveredOrdersByCompanyId(int companyId) {
+        String sql = """
+        SELECT 
+            o.id,
+            o.order_date,
+            o.delivery_date,
+            o.status,
+            o.client_id,
+            o.dealer_id,
+            o.total_price
+        FROM orders o
+        JOIN dealers d ON o.dealer_id = d.id
+        JOIN products p ON d.id = p.company_id
+        JOIN companies c ON p.company_id = c.id
+        WHERE c.id = ? AND o.status = 'ENTREGADO'
+    """;
+        return jdbcTemplate.query(sql, new Object[]{companyId}, (rs, rowNum) ->
+                new OrdersEntity(
+                        rs.getInt("id"),
+                        rs.getDate("order_date"),
+                        rs.getDate("delivery_date"),
+                        rs.getString("status"),
+                        rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
+                        rs.getDouble("total_price")
+                )
+        );
+    }
+
 }
