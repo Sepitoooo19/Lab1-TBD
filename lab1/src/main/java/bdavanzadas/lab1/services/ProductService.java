@@ -72,4 +72,13 @@ public class ProductService {
         return result;
     }
 
+    //findByCompanyId en repository
+    @Transactional(readOnly = true)
+    public List<ProductEntity> getProductsByCompanyId(int companyId) {
+        return repo.findByCompanyId(companyId);
+    }
+
+
+
+
 }

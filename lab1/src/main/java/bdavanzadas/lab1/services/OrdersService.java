@@ -58,7 +58,18 @@ public class OrdersService {
 
     // en el repository se hace un query para obtener todos los pedidos de un cliente
     @Transactional(readOnly = true)
-    public List<OrdersEntity> getOrdersByClientId(int clientId) {
+    public List<OrdersEntity> getOrdersByClientId() {
+        // Obtener el userId del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+
+        // Obtener el clientId asociado al userId
+        String sql = "SELECT id FROM clients WHERE user_id = ?";
+        Integer clientId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        if (clientId == null) {
+            throw new IllegalArgumentException("No se encontró un cliente asociado al usuario con ID " + userId);
+        }
+
+        // Obtener los pedidos del cliente
         return ordersRepository.findByClientId(clientId);
     }
 
@@ -166,6 +177,12 @@ public class OrdersService {
         return ordersRepository.findDeliveredOrdersByCompanyId(companyId);
     }
 
+    // Pedidos por ID de la empresa
+    @Transactional(readOnly = true)
+    public List<OrdersEntity> findOrdersByCompanyId(int companyId) {
+        return ordersRepository.findOrdersByCompanyId(companyId);
+    }
+
     @Transactional
     public void updateOrderStatusByDealerId(int orderId, int dealerId, String newStatus) {
         ordersRepository.updateOrderStatusByDealerId(orderId, dealerId, newStatus);
@@ -177,4 +194,9 @@ public class OrdersService {
         jdbcTemplate.update(sql, newStatus, orderId);
     }
 
+    //findProductsByOrderId que está en el repository
+    @Transactional(readOnly = true)
+    public List<ProductEntity> findProductsByOrderId(int orderId) {
+        return ordersRepository.findProductsByOrderId(orderId);
+    }
 }

@@ -22,7 +22,7 @@ public class ProductRepository {
                   rs.getInt("stock"),
                   rs.getFloat("price"),
                   rs.getString("category"),
-                  rs.getInt("companyId")));
+                  rs.getInt("company_id")));
     }
     //find by id
    public ProductEntity findbyid(int id){
@@ -34,16 +34,16 @@ public class ProductRepository {
                    rs.getInt("stock"),
                    rs.getFloat("price"),
                        rs.getString("category"),
-                   rs.getInt("companyId")));
+                   rs.getInt("company_id")));
    }
    //SAVE
     public void save(ProductEntity p){
-       String sql="INSERTO INTO products (name,stock,price,category,supplier) VALUES (?,?,?,?,?)";
+       String sql="INSERTO INTO products (name,stock,price,category,company_id) VALUES (?,?,?,?,?)";
        jdbcTemplate.update(sql,p.getName(),p.getStock(),p.getPrice(),p.getCompanyId());
     }
     //UPDATE
     public void update(ProductEntity p){
-       String sql="UPDATE products SET name=?,stock=?,price=?,category=?,supplier=? WHERE id=?";
+       String sql="UPDATE products SET name=?,stock=?,price=?,category=?,company_id=? WHERE id=?";
         jdbcTemplate.update(sql,p.getName(),p.getStock(),p.getPrice(),p.getCategory(),p.getCompanyId(),p.getId());
     }
 
@@ -63,7 +63,7 @@ public class ProductRepository {
                   rs.getInt("stock"),
                   rs.getFloat("price"),
                   rs.getString("category"),
-                  rs.getInt("companyId")));
+                  rs.getInt("company_id")));
     }
 
     //find by categoria
@@ -76,7 +76,7 @@ public class ProductRepository {
                    rs.getInt("stock"),
                    rs.getFloat("price"),
                    rs.getString("category"),
-                       rs.getInt("companyId")));
+                       rs.getInt("company_id")));
     }
 
     public List<String> findAllCategories() {
@@ -108,4 +108,21 @@ public class ProductRepository {
                 )
         );
     }
+
+    //get products by company id
+    public List<ProductEntity> findByCompanyId(int companyId) {
+        String sql = "SELECT * FROM products WHERE company_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{companyId}, (rs, rowNum) ->
+                new ProductEntity(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("stock"),
+                        rs.getFloat("price"),
+                        rs.getString("category"),
+                        rs.getInt("company_id")
+                )
+        );
+    }
+
+
 }

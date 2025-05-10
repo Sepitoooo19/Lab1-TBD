@@ -34,4 +34,10 @@ public class ProductController {
     public List<List<ProductEntity>> getMostOrderProducts() {
         return service.getTopProductsByCategory();
     }
+
+    @GetMapping("/company/{id}")
+    public List<ProductEntity> getProductsByCompanyId(@PathVariable int id) {
+        return service.getProductsByCompanyId(id);
+    }
+
 }

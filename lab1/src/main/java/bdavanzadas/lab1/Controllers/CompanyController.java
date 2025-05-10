@@ -18,7 +18,6 @@ public class CompanyController {
     @GetMapping
     public List<CompanyEntity> getAllCompanies() {
         List<CompanyEntity> companies = service.getAllCompanies();
-        System.out.println("Compañías enviadas al cliente: " + companies);
         return companies;
     }
     @GetMapping("/obtenerporid/{id}")

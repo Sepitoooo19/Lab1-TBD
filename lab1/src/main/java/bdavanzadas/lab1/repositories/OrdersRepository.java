@@ -221,4 +221,45 @@ public class OrdersRepository implements OrdersRepositoryInt {
         jdbcTemplate.update(sql, newStatus, orderId, dealerId);
     }
 
+    //get all orders by company id
+    public List<OrdersEntity> findOrdersByCompanyId(int companyId) {
+        String sql = """
+        SELECT o.*
+        FROM orders o
+        JOIN dealers d ON o.dealer_id = d.id
+        JOIN products p ON d.id = p.company_id
+        WHERE p.company_id = ?
+    """;
+        return jdbcTemplate.query(sql, new Object[]{companyId}, (rs, rowNum) ->
+                new OrdersEntity(
+                        rs.getInt("id"),
+                        rs.getDate("order_date"),
+                        rs.getDate("delivery_date"),
+                        rs.getString("status"),
+                        rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
+                        rs.getDouble("total_price")
+                )
+        );
+    }
+
+    //Get all products by order id
+    public List<ProductEntity> findProductsByOrderId(int orderId) {
+        String sql = "SELECT p.* FROM products p JOIN order_products op ON p.id = op.product_id WHERE op.order_id = ?";
+        return jdbcTemplate.query(sql, new Object[]{orderId}, (rs, rowNum) ->
+                new ProductEntity(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("stock"),
+                        rs.getFloat("price"),
+                        rs.getString("category"),
+                        rs.getInt("company_id")
+                )
+        );
+    }
+
+
+
+
+
 }

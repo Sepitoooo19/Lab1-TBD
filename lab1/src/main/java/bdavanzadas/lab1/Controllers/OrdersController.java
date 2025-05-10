@@ -4,6 +4,7 @@ import bdavanzadas.lab1.dtos.CrearOrdenDTO;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
+import bdavanzadas.lab1.entities.ProductEntity;
 import bdavanzadas.lab1.services.OrdersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,13 +57,15 @@ public class OrdersController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<OrdersEntity>> getOrdersByClientId(@PathVariable int clientId) {
-        List<OrdersEntity> orders = ordersService.getOrdersByClientId(clientId);
-        if (orders != null && !orders.isEmpty()) {
-            return ResponseEntity.ok(orders);
-        } else {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/client/orders")
+    public ResponseEntity<List<OrdersEntity>> getOrdersByClient() {
+        try {
+            List<OrdersEntity> orders = ordersService.getOrdersByClientId();
+            return ResponseEntity.ok(orders); // Devuelve un array vacío si no hay pedidos
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // Devuelve 403 si hay un error de validación
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Devuelve 500 para errores inesperados
         }
     }
 
@@ -109,6 +112,19 @@ public class OrdersController {
         return ResponseEntity.ok(orders);
     }
 
+    //Endpoint para obtener los pedidos por el ID de la empresa
+
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<List<OrdersEntity>> getOrdersByCompanyId(@PathVariable int companyId) {
+        List<OrdersEntity> orders = ordersService.findOrdersByCompanyId(companyId);
+        if (orders != null && !orders.isEmpty()) {
+            return ResponseEntity.ok(orders);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @GetMapping("/dealer/{id}")
     public ResponseEntity<List<OrdersEntity>> getOrdersByDealerId(@PathVariable int id) {
         List<OrdersEntity> orders = ordersService.getOrdersByDealerId(id);
@@ -132,4 +148,22 @@ public class OrdersController {
         ordersService.updateOrderStatusByDealerId(id, dealerId, requestBody.get("status"));
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{orderId}/products")
+    public ResponseEntity<List<ProductEntity>> getProductsByOrderId(@PathVariable int orderId) {
+        try {
+            List<ProductEntity> products = ordersService.findProductsByOrderId(orderId);
+            if (products.isEmpty()) {
+                return ResponseEntity.noContent().build(); // Devuelve 204 si no hay productos
+            }
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Devuelve 500 para errores inesperados
+        }
+    }
+
+
+
+
+
 }

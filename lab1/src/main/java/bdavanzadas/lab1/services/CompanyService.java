@@ -16,7 +16,6 @@ public class CompanyService {
     @Transactional(readOnly = true)
     public List<CompanyEntity> getAllCompanies() {
         List<CompanyEntity> companies = companyRepository.findAll();
-        System.out.println("Compañías encontradas: " + companies);
         return companies;
     }
     @Transactional(readOnly = true)
