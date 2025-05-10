@@ -12,5 +12,11 @@ public class CompanyEntity {
     private String name;
     private String email;
     private String phone;
+    private String address;
+    private String rut;
+    private String type;
+    private int deliveries;
+    private int failedDeliveries;
+    private int totalSales;
 
 }

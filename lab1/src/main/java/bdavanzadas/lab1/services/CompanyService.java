@@ -1,6 +1,5 @@
 package bdavanzadas.lab1.services;
 
-import bdavanzadas.lab1.dtos.FailedDeliveriesCompanyDTO;
 import bdavanzadas.lab1.entities.CompanyEntity;
 import bdavanzadas.lab1.repositories.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,12 @@ import java.util.List;
 public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
+
     @Transactional(readOnly = true)
     public List<CompanyEntity> getAllCompanies() {
-        return companyRepository.findAll();
-
+        List<CompanyEntity> companies = companyRepository.findAll();
+        System.out.println("Compañías encontradas: " + companies);
+        return companies;
     }
     @Transactional(readOnly = true)
     public CompanyEntity findbyid(int id) {
@@ -35,7 +36,8 @@ public class CompanyService {
         companyRepository.delete(id);
     }
 
-    public List<FailedDeliveriesCompanyDTO> getCompaniesWithMostFailedDeliveries() {
+    @Transactional(readOnly = true)
+    public List<CompanyEntity> getCompaniesWithMostFailedDeliveries() {
         return companyRepository.getCompaniesWithMostFailedDeliveries();
     }
 }

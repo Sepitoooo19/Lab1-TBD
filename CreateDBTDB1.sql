@@ -10,12 +10,17 @@ CREATE TABLE users (
     role VARCHAR(20) CHECK (role IN ('ADMIN', 'CLIENT', 'DEALER')) NOT NULL
 );
 
--- Tabla: companies
 CREATE TABLE companies (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100),
-    phone VARCHAR(20)
+    id SERIAL PRIMARY KEY,          -- Identificador único de la compañía
+    name VARCHAR(100) NOT NULL,     -- Nombre de la compañía
+    email VARCHAR(100),             -- Correo electrónico de la compañía
+    phone VARCHAR(20),              -- Teléfono de la compañía
+    address VARCHAR(255),           -- Dirección de la compañía
+    rut VARCHAR(20),                -- RUT de la compañía
+    type VARCHAR(50),               -- Tipo de compañía
+    deliveries INT DEFAULT 0,       -- Total de entregas realizadas
+    failed_deliveries INT DEFAULT 0,-- Total de entregas fallidas
+    total_sales FLOAT DEFAULT 0     -- Total de ventas realizadas
 );
 
 -- Tabla: payment_methods
