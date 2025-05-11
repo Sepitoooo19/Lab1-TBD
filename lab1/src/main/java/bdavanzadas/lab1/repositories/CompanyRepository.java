@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class CompanyRepository {
@@ -147,6 +148,34 @@ public class CompanyRepository {
     """;
 
         jdbcTemplate.update(sql);
+    }
+
+    public List<Map<String, Object>> getCompaniesByDeliveredFoodVolume() {
+        String sql = """
+            SELECT 
+                c.id AS company_id, 
+                c.name AS company_name, 
+                c.type AS company_type, 
+                SUM(od.total_products) AS total_food_delivered
+            FROM 
+                companies c
+            JOIN 
+                products p ON c.id = p.company_id
+            JOIN 
+                order_products op ON p.id = op.product_id
+            JOIN 
+                orders o ON op.order_id = o.id
+            JOIN 
+                order_details od ON o.id = od.order_id
+            WHERE 
+                o.status = 'ENTREGADO'
+            GROUP BY 
+                c.id, c.name, c.type
+            ORDER BY 
+                total_food_delivered DESC;
+        """;
+
+        return jdbcTemplate.queryForList(sql);
     }
 
 

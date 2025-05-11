@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CompanyService {
@@ -47,5 +48,10 @@ public class CompanyService {
     @Transactional
     public void updateCompanyMetrics() {
         companyRepository.updateCompanyMetrics();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getCompaniesByDeliveredFoodVolume() {
+        return companyRepository.getCompaniesByDeliveredFoodVolume();
     }
 }

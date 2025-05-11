@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/companies")
@@ -20,6 +21,7 @@ public class CompanyController {
         List<CompanyEntity> companies = service.getAllCompanies();
         return ResponseEntity.ok(companies);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<CompanyEntity> getCompanyById(@PathVariable int id) {
         System.out.println("Solicitud recibida para obtener la empresa con ID: " + id);
@@ -31,12 +33,21 @@ public class CompanyController {
         System.out.println("Empresa encontrada: " + company.getName());
         return ResponseEntity.ok(company);
     }
+
     @PostMapping("/crear")
-    public void create(@RequestBody CompanyEntity c) {service.saveCompany(c);}
+    public void create(@RequestBody CompanyEntity c) {
+        service.saveCompany(c);
+    }
+
     @PostMapping("/update")
-    public void update(@RequestBody CompanyEntity c) {service.updateCompany(c);}
+    public void update(@RequestBody CompanyEntity c) {
+        service.updateCompany(c);
+    }
+
     @PostMapping("/delete/{id}")
-    public void delete(@PathVariable int id) {service.deleteCompany(id);}
+    public void delete(@PathVariable int id) {
+        service.deleteCompany(id);
+    }
 
     @GetMapping("/failed-deliveries")
     public ResponseEntity<List<CompanyEntity>> getCompaniesWithMostFailedDeliveries() {
@@ -48,5 +59,11 @@ public class CompanyController {
     public ResponseEntity<Void> updateCompanyMetrics() {
         service.updateCompanyMetrics();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/delivered-food-volume")
+    public ResponseEntity<List<Map<String, Object>>> getCompaniesByDeliveredFoodVolume() {
+        List<Map<String, Object>> companies = service.getCompaniesByDeliveredFoodVolume();
+        return ResponseEntity.ok(companies);
     }
 }
