@@ -82,11 +82,18 @@ public class OrdersController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createOrder(@RequestBody OrdersEntity order, @RequestParam List<Integer> productIds) {
+    public ResponseEntity<?> createOrder(
+            @RequestBody OrdersEntity order, // Cuerpo de la solicitud
+            @RequestParam List<Integer> productIds // Parámetro de consulta
+    ) {
+        System.out.println("Orden recibida: " + order);
+        System.out.println("IDs de productos recibidos: " + productIds);
+
         try {
             ordersService.createOrderWithProducts(order, productIds);
             return ResponseEntity.ok("Orden creada exitosamente");
         } catch (Exception e) {
+            e.printStackTrace(); // Imprime el error completo en los logs
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la orden: " + e.getMessage());
         }
     }
@@ -167,6 +174,8 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Devuelve 500 para errores inesperados
         }
     }
+
+
 
 
 

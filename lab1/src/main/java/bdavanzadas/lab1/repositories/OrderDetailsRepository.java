@@ -32,13 +32,13 @@ public class OrderDetailsRepository implements OrderDetailsRepositoryInt {
     }
 
     public void save(OrderDetailsEntity orderDetails) {
-        String sql = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, orderDetails.getOrderId(), orderDetails.getPrice());
+        String sql = "INSERT INTO order_details (order_id, payment_method, total_products, price) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, orderDetails.getOrderId(), orderDetails.getPaymentMethod(), orderDetails.getTotalProducts(), orderDetails.getPrice());
     }
 
     public void update(OrderDetailsEntity orderDetails) {
-        String sql = "UPDATE order_details SET order_id = ?, product_id = ?, quantity = ?, price = ? WHERE id = ?";
-        jdbcTemplate.update(sql, orderDetails.getOrderId(), orderDetails.getPrice(), orderDetails.getId());
+        String sql = "UPDATE order_details SET order_id = ?, payment_method = ?, total_products = ?, price = ? WHERE id = ?";
+        jdbcTemplate.update(sql, orderDetails.getOrderId(), orderDetails.getPaymentMethod(), orderDetails.getTotalProducts(), orderDetails.getPrice());
     }
 
     public void delete(int id) {

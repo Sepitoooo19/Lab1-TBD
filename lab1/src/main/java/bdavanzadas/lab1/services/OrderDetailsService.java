@@ -17,6 +17,7 @@ public class OrderDetailsService {
         this.orderDetailsRepository = orderDetailsRepository;
     }
 
+
     @Transactional(readOnly = true)
     public List<OrderDetailsEntity> getAllOrderDetails() {
         return orderDetailsRepository.findAll();
