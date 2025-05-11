@@ -6,6 +6,7 @@ import bdavanzadas.lab1.entities.OrderDetailsEntity;
 import bdavanzadas.lab1.repositories.OrderDetailsRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderDetailsService {
@@ -44,8 +45,8 @@ public class OrderDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public String findPaymentmethodUrgentOrders() {
-        return orderDetailsRepository.findPaymentmethodUrgentOrders();
+    public Map<String, Integer> getMostUsedPaymentMethodForUrgentOrders() {
+        return orderDetailsRepository.getMostUsedPaymentMethodForUrgentOrders();
     }
 
     @Transactional

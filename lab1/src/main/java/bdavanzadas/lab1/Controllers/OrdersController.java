@@ -1,8 +1,6 @@
 package bdavanzadas.lab1.Controllers;
 
-import bdavanzadas.lab1.dtos.CrearOrdenDTO;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
-import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.entities.ProductEntity;
 import bdavanzadas.lab1.services.OrdersService;
@@ -196,6 +194,16 @@ public class OrdersController {
             return ResponseEntity.ok(address);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/{id}/urgent")
+    public ResponseEntity<String> markOrderAsUrgent(@PathVariable int id) {
+        try {
+            ordersService.markAsUrgent(id);
+            return ResponseEntity.ok("Pedido marcado como URGENTE");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al marcar el pedido como URGENTE");
         }
     }
 

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,24 +53,10 @@ public class ProductService {
         return repo.findAllCategories();
     }
     //RF 02: obtener los productos con mas pedidos en el mes segun categoria
-    @Transactional
-    public List<List<ProductEntity>> getTopProductsByCategory() {
-        List<String> categories = repo.findAllCategories();
-        List<List<ProductEntity>> result = new ArrayList<>();
 
-        // Obtener la fecha actual
-        LocalDate currentDate = LocalDate.now();
-        int currentMonth = currentDate.getMonthValue();
-        int currentYear = currentDate.getYear();
-
-        // Iterar por cada categoría
-        for (String category : categories) {
-            // Obtener los productos más pedidos por categoría en el mes actual
-            List<ProductEntity> topProducts = repo.getTopProductsByCategoryAndMonth(category, currentMonth, currentYear);
-            result.add(topProducts);
-        }
-
-        return result;
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getTopProductsByCategoryForLastMonth() {
+        return repo.findTopProductsByCategoryForLastMonth();
     }
 
     //findByCompanyId en repository

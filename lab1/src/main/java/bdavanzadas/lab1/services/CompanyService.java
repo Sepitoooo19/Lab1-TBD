@@ -18,18 +18,22 @@ public class CompanyService {
         List<CompanyEntity> companies = companyRepository.findAll();
         return companies;
     }
+
     @Transactional(readOnly = true)
     public CompanyEntity findbyid(int id) {
         return companyRepository.findbyid(id);
     }
+
     @Transactional
     public void saveCompany(CompanyEntity company) {
         companyRepository.save(company);
     }
+
     @Transactional
     public void updateCompany(CompanyEntity company) {
         companyRepository.update(company);
     }
+
     @Transactional
     public void deleteCompany(int id) {
         companyRepository.delete(id);
@@ -38,5 +42,10 @@ public class CompanyService {
     @Transactional(readOnly = true)
     public List<CompanyEntity> getCompaniesWithMostFailedDeliveries() {
         return companyRepository.getCompaniesWithMostFailedDeliveries();
+    }
+
+    @Transactional
+    public void updateCompanyMetrics() {
+        companyRepository.updateCompanyMetrics();
     }
 }

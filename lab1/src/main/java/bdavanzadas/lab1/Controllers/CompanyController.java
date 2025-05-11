@@ -43,4 +43,10 @@ public class CompanyController {
         List<CompanyEntity> companies = service.getCompaniesWithMostFailedDeliveries();
         return ResponseEntity.ok(companies);
     }
+
+    @PostMapping("/update-metrics")
+    public ResponseEntity<Void> updateCompanyMetrics() {
+        service.updateCompanyMetrics();
+        return ResponseEntity.ok().build();
+    }
 }

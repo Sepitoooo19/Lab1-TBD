@@ -14,7 +14,25 @@ public class CompanyRepository {
 
     //find all
     public List<CompanyEntity> findAll() {
-        String sql = "SELECT * FROM companies";
+        String sql = """
+        SELECT 
+            c.id,
+            c.name,
+            c.email,
+            c.phone,
+            c.address,
+            c.rut,
+            c.type,
+            COUNT(o.id) AS deliveries, -- Total de entregas
+            SUM(CASE WHEN o.status = 'FALLIDA' THEN 1 ELSE 0 END) AS failed_deliveries, -- Total de entregas fallidas
+            SUM(o.total_price) AS total_sales -- Total de ventas
+        FROM 
+            companies c
+        LEFT JOIN orders o ON c.id = o.client_id -- Relación entre empresas y pedidos
+        GROUP BY 
+            c.id, c.name, c.email, c.phone, c.address, c.rut, c.type
+    """;
+
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new CompanyEntity(
                         rs.getInt("id"),
@@ -24,13 +42,12 @@ public class CompanyRepository {
                         rs.getString("address"),
                         rs.getString("rut"),
                         rs.getString("type"),
-                        rs.getInt("deliveries"),
-                        rs.getInt("failed_deliveries"),
-                        rs.getInt("total_sales")
+                        rs.getInt("deliveries"), // Total de entregas
+                        rs.getInt("failed_deliveries"), // Total de entregas fallidas
+                        rs.getInt("total_sales") // Total de ventas
                 )
         );
     }
-
     //find by id
     public CompanyEntity findbyid(int id){
         String sql = "SELECT * FROM companies WHERE id=?";
@@ -102,6 +119,35 @@ public class CompanyRepository {
         );
     }
 
+    public void updateCompanyMetrics() {
+        String sql = """
+        UPDATE companies c
+        SET 
+            deliveries = COALESCE((
+                SELECT COUNT(o.id)
+                FROM orders o
+                JOIN order_products op ON o.id = op.order_id
+                JOIN products p ON op.product_id = p.id
+                WHERE p.company_id = c.id
+            ), 0),
+            failed_deliveries = COALESCE((
+                SELECT COUNT(o.id)
+                FROM orders o
+                JOIN order_products op ON o.id = op.order_id
+                JOIN products p ON op.product_id = p.id
+                WHERE p.company_id = c.id AND o.status = 'FALLIDA'
+            ), 0),
+            total_sales = COALESCE((
+                SELECT SUM(o.total_price)
+                FROM orders o
+                JOIN order_products op ON o.id = op.order_id
+                JOIN products p ON op.product_id = p.id
+                WHERE p.company_id = c.id
+            ), 0);
+    """;
+
+        jdbcTemplate.update(sql);
+    }
 
 
 }

@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ProductRepository {
@@ -84,29 +85,28 @@ public class ProductRepository {
         return jdbcTemplate.queryForList(sql, String.class);
     }
 
-    public List<ProductEntity> getTopProductsByCategoryAndMonth(String category, int month, int year) {
+    public List<Map<String, Object>> findTopProductsByCategoryForLastMonth() {
         String sql = """
-        SELECT p.id, p.name, COUNT(op.product_id) AS product_count
-        FROM products p
-        JOIN order_products op ON p.id = op.product_id
-        JOIN orders o ON o.id = op.order_id
-        WHERE EXTRACT(MONTH FROM o.order_date) = ? 
-        AND EXTRACT(YEAR FROM o.order_date) = ? 
-        AND p.category = ?
-        GROUP BY p.id, p.name
-        ORDER BY product_count DESC
-        LIMIT 5
-    """;
-        return jdbcTemplate.query(sql, new Object[]{month, year, category}, (rs, rowNum) ->
-                new ProductEntity(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        0, // Puedes obtener estos valores si los necesitas
-                        0,
-                        category, // Pasamos la categoría directamente
-                        0 // Puedes obtener estos valores si los necesitas
-                )
-        );
+            SELECT 
+                p.category, 
+                p.name AS product_name, 
+                COUNT(op.product_id) AS product_count
+            FROM 
+                products p
+            JOIN 
+                order_products op ON p.id = op.product_id
+            JOIN 
+                orders o ON o.id = op.order_id
+            WHERE 
+                o.order_date >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 month'
+                AND o.order_date < DATE_TRUNC('month', CURRENT_DATE)
+            GROUP BY 
+                p.category, p.name
+            ORDER BY 
+                p.category, product_count DESC
+        """;
+
+        return jdbcTemplate.queryForList(sql);
     }
 
     //get products by company id

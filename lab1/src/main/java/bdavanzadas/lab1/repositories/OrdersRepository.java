@@ -117,7 +117,7 @@ public class OrdersRepository implements OrdersRepositoryInt {
         SELECT c.id, c.name, c.rut, c.email, c.phone, c.address, SUM(o.total_price) AS total_spent
         FROM orders o
         JOIN clients c ON o.client_id = c.id
-        WHERE o.status = 'entregado'
+        WHERE o.status = 'ENTREGADO'
         GROUP BY c.id, c.name, c.rut, c.email, c.phone, c.address
         ORDER BY total_spent DESC
         LIMIT 1
@@ -167,10 +167,10 @@ public class OrdersRepository implements OrdersRepositoryInt {
             o.dealer_id,
             o.total_price
         FROM orders o
-        JOIN dealers d ON o.dealer_id = d.id
-        JOIN products p ON d.id = p.company_id
+        JOIN order_products op ON o.id = op.order_id
+        JOIN products p ON op.product_id = p.id
         JOIN companies c ON p.company_id = c.id
-        WHERE c.id = ? AND o.status = 'FALLIDO'
+        WHERE c.id = ? AND o.status = 'FALLIDA'
     """;
         return jdbcTemplate.query(sql, new Object[]{companyId}, (rs, rowNum) ->
                 new OrdersEntity(
@@ -198,8 +198,8 @@ public class OrdersRepository implements OrdersRepositoryInt {
             o.dealer_id,
             o.total_price
         FROM orders o
-        JOIN dealers d ON o.dealer_id = d.id
-        JOIN products p ON d.id = p.company_id
+        JOIN order_products op ON o.id = op.order_id
+        JOIN products p ON op.product_id = p.id
         JOIN companies c ON p.company_id = c.id
         WHERE c.id = ? AND o.status = 'ENTREGADO'
     """;

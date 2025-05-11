@@ -222,4 +222,10 @@ public class OrdersService {
         String sql = "SELECT address FROM clients WHERE user_id = ?";
         return jdbcTemplate.queryForObject(sql, String.class, userId);
     }
+
+    @Transactional
+    public void markAsUrgent(int orderId) {
+        String sql = "UPDATE orders SET status = 'URGENTE' WHERE id = ?";
+        jdbcTemplate.update(sql, orderId);
+    }
 }

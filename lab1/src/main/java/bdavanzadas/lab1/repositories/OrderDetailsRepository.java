@@ -6,10 +6,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.security.PublicKey;
+import java.util.HashMap;
 import java.util.List;
-
-
-
+import java.util.Map;
 
 
 @Repository
@@ -73,16 +72,32 @@ public class OrderDetailsRepository implements OrderDetailsRepositoryInt {
     }
 
     //RF 06: medio de pago en pedidos urgentes
-    public String findPaymentmethodUrgentOrders() {
-        String sql = "SELECT od.payment_method " +
-                "FROM order_details od " +
-                "JOIN orders o ON o.id = od.order_id " +
-                "WHERE o.status = 'urgente' " +
-                "GROUP BY od.payment_method " +
-                "ORDER BY COUNT(*) DESC " +
-                "LIMIT 1";
+    public Map<String, Integer> getMostUsedPaymentMethodForUrgentOrders() {
+        String sql = """
+            SELECT 
+                od.payment_method, 
+                COUNT(*) AS usage_count
+            FROM 
+                orders o
+            JOIN 
+                order_details od ON o.id = od.order_id
+            WHERE 
+                o.status = 'URGENTE'
+            GROUP BY 
+                od.payment_method
+            ORDER BY 
+                usage_count DESC
+            LIMIT 1;
+        """;
 
-        // Ejecuta la consulta y retorna solo el tipo de pago más utilizado
-        return jdbcTemplate.queryForObject(sql, String.class);
+        return jdbcTemplate.query(sql, rs -> {
+            Map<String, Integer> result = new HashMap<>();
+            if (rs.next()) {
+                result.put(rs.getString("payment_method"), rs.getInt("usage_count"));
+            }
+            return result;
+        });
     }
+
+
 }

@@ -3,10 +3,12 @@ package bdavanzadas.lab1.Controllers;
 import bdavanzadas.lab1.entities.ProductEntity;
 import bdavanzadas.lab1.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/products")
@@ -30,9 +32,10 @@ public class ProductController {
     public List<ProductEntity> getProductsByCategory(@PathVariable String category) {return service.getProductsByCategory(category);}
     @GetMapping("/categorias")
     public List<String> findallCategories(){return service.findallCategories();}
-    @GetMapping("/ObtenePedidosPorCategoria")
-    public List<List<ProductEntity>> getMostOrderProducts() {
-        return service.getTopProductsByCategory();
+    @GetMapping("/top-by-category")
+    public ResponseEntity<List<Map<String, Object>>> getTopProductsByCategoryForLastMonth() {
+        List<Map<String, Object>> topProducts = service.getTopProductsByCategoryForLastMonth();
+        return ResponseEntity.ok(topProducts);
     }
 
     @GetMapping("/company/{id}")
