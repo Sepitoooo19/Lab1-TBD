@@ -69,6 +69,12 @@ public class OrdersController {
         }
     }
 
+    @GetMapping("/client/{id}")
+    public ResponseEntity<List<OrdersEntity>> getOrdersByClientId(@PathVariable int id) {
+        List<OrdersEntity> orders = ordersService.getOrdersByClientId(id);
+        return ResponseEntity.ok(orders);
+    }
+
     @GetMapping("/top-spender")
     public ResponseEntity<TopSpenderDTO> getTopSpender() {
         TopSpenderDTO topSpender = ordersService.getTopSpender();

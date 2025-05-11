@@ -73,6 +73,12 @@ public class OrdersService {
         return ordersRepository.findByClientId(clientId);
     }
 
+    // obtener los pedidos por ID de cliente
+    @Transactional(readOnly = true)
+    public List<OrdersEntity> getOrdersByClientId(int clientId) {
+        return ordersRepository.findByClientId(clientId);
+    }
+
     // en el repository se hace un query para obtener todos los pedidos de un dealer
     @Transactional(readOnly = true)
     public List<OrdersEntity> getOrdersByDealerId(int dealerId) {
