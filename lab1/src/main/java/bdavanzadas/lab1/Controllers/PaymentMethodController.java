@@ -47,4 +47,9 @@ public class PaymentMethodController {
     public void delete(@PathVariable int id) {
         service.deletePaymentMethod(id);
     }
+
+    @GetMapping("/company/{companyId}")
+    public List<PaymentMethodEntity> getByCompanyId(@PathVariable int companyId) {
+        return service.getPaymentMethodsByCompanyId(companyId);
+    }
 }

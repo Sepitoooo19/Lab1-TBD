@@ -61,5 +61,15 @@ public class ClientController {
         }
     }
 
+    @GetMapping("/name/{id}")
+    public ResponseEntity<String> getClientNameById(@PathVariable int id) {
+        String clientName = clientService.getNameByClientId(id);
+        if (clientName != null) {
+            return new ResponseEntity<>(clientName, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }

@@ -124,5 +124,11 @@ public class ProductRepository {
         );
     }
 
+    //GetCompanyIdByProductId
+    public int getCompanyIdByProductId(int productId) {
+        String sql = "SELECT company_id FROM products WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{productId}, Integer.class);
+    }
+
 
 }

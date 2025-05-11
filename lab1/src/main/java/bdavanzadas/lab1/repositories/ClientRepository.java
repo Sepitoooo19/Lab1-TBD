@@ -57,4 +57,10 @@ public class ClientRepository implements ClientRepositoryInt {
         });
     }
 
+    //getNameByClientId
+    public String getNameByClientId(int clientId) {
+        String sql = "SELECT name FROM clients WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{clientId}, String.class);
+    }
+
 }

@@ -14,7 +14,7 @@ public class PaymentMethodRepostitory {
 
     //FIND ALL
     public List<PaymentMethodEntity> findAll() {
-        String sql = "SELECT * FROM payment_method";
+        String sql = "SELECT * FROM payment_methods";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new PaymentMethodEntity(
                         rs.getInt("id"),
@@ -22,7 +22,7 @@ public class PaymentMethodRepostitory {
     }
     //FIND BY ID
     public PaymentMethodEntity findById(int id) {
-        String sql = "SELECT * FROM payment_method WHERE id = ?";
+        String sql = "SELECT * FROM payment_methods WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
             PaymentMethodEntity p = new PaymentMethodEntity();
             p.setId(rs.getInt("id"));
@@ -32,7 +32,7 @@ public class PaymentMethodRepostitory {
     }
     //FIND BY NAME
     public PaymentMethodEntity findByType(String type) {
-        String sql = "SELECT * FROM payment_method WHERE type = ?";
+        String sql = "SELECT * FROM payment_methods WHERE type = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{type}, (rs, rowNum) -> {
             PaymentMethodEntity p = new PaymentMethodEntity();
             p.setId(rs.getInt("id"));
@@ -43,13 +43,13 @@ public class PaymentMethodRepostitory {
 
     // SAVE
     public void save(PaymentMethodEntity p) {
-        String sql = "INSERT INTO payment_method (type) VALUES (?)";
+        String sql = "INSERT INTO payment_methods (type) VALUES (?)";
         jdbcTemplate.update(sql, p.getType());
     }
 
     //UPDATE
     public void update(PaymentMethodEntity p) {
-        String sql = "UPDATE payment_method SET type = ? WHERE id = ?";
+        String sql = "UPDATE payment_methods SET type = ? WHERE id = ?";
         jdbcTemplate.update(sql, p.getType(), p.getId());
     }
 
@@ -58,6 +58,23 @@ public class PaymentMethodRepostitory {
     public void deleteById(int id) {
         String sql = "DELETE FROM payment_method WHERE id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    //GetPaymentMethodsByCompanyId
+    public List<PaymentMethodEntity> getPaymentMethodsByCompanyId(int companyId) {
+        String sql = """
+        SELECT pm.id, pm.type
+        FROM payment_methods pm
+        INNER JOIN company_payment_methods cpm ON pm.id = cpm.payment_method_id
+        WHERE cpm.company_id = ?
+    """;
+
+        return jdbcTemplate.query(sql, new Object[]{companyId}, (rs, rowNum) -> {
+            PaymentMethodEntity paymentMethod = new PaymentMethodEntity();
+            paymentMethod.setId(rs.getInt("id"));
+            paymentMethod.setType(rs.getString("type"));
+            return paymentMethod;
+        });
     }
 
 

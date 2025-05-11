@@ -40,4 +40,10 @@ public class ProductController {
         return service.getProductsByCompanyId(id);
     }
 
+    //getCompanyIdByProductId
+
+    @GetMapping("/companyid/{id}")
+    public int getCompanyIdByProductId(@PathVariable int id) {
+        return service.getCompanyIdByProductId(id);
+    }
 }

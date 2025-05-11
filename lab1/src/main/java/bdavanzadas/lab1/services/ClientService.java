@@ -42,6 +42,13 @@ public class ClientService {
         clientRepository.delete(id);
     }
 
+    //getNameByClientId
+    @Transactional(readOnly = true)
+    public String getNameByClientId(int id) {
+        ClientEntity client = clientRepository.findById(id);
+        return client != null ? client.getName() : null;
+    }
+
 
 
 }

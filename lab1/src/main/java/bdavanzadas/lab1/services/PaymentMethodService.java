@@ -38,4 +38,11 @@ public class PaymentMethodService {
     public void updatePaymentMethod(PaymentMethodEntity paymentMethodEntity) {
         paymentMethodRepository.update(paymentMethodEntity);
     }
+
+    //getPaymentMethodsByCompanyId
+    public List<PaymentMethodEntity> getPaymentMethodsByCompanyId(int companyId) {
+        return paymentMethodRepository.getPaymentMethodsByCompanyId(companyId);
+    }
+
+
 }
