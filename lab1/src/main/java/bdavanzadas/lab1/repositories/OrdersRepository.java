@@ -258,6 +258,12 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+    //GET ID OF ORDER
+    public int getOrderIdByClientId(int clientId) {
+        String sql = "SELECT id FROM orders WHERE client_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{clientId}, Integer.class);
+    }
+
 
 
 

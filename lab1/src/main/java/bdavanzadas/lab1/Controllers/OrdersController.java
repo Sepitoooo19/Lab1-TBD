@@ -175,6 +175,29 @@ public class OrdersController {
         }
     }
 
+    //    getLastInsertedOrderId
+    @GetMapping("/last-inserted")
+    public ResponseEntity<Integer> getLastInsertedOrderId() {
+        try {
+            int lastInsertedOrderId = ordersService.getLastInsertedOrderId(); // Llama al servicio
+            return ResponseEntity.ok(lastInsertedOrderId); // Devuelve el ID en la respuesta
+        } catch (Exception e) {
+            e.printStackTrace(); // Registra el error en los logs
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Devuelve un error 500
+        }
+    }
+
+
+    //getAddressOfLoggedClient
+    @GetMapping("/address")
+    public ResponseEntity<String> getAddressOfLoggedClient() {
+        try {
+            String address = ordersService.getAddressOfLoggedClient();
+            return ResponseEntity.ok(address);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
 

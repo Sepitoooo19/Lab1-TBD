@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/order-details")
@@ -63,8 +64,42 @@ public class OrderDetailsController {
             return ResponseEntity.notFound().build();
         }
     }
+    /*
     @GetMapping("/ObtenerMediodepagoUrgente")
     public String obtenerMedioPagoUrgente(){
         return orderDetailsService.findPaymentmethodUrgentOrders();
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Void> createOrderDetails(@RequestParam int orderId,
+                                                   @RequestParam String paymentMethod,
+                                                   @RequestParam int totalProducts,
+                                                   @RequestParam double price) {
+        try {
+            orderDetailsService.createOrderDetails(orderId, paymentMethod, totalProducts, price);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    */
+
+    @PostMapping("/create-for-last-order")
+    public ResponseEntity<Void> createOrderDetailsForLastOrder(@RequestBody Map<String, Object> requestBody) {
+        try {
+            // Extraer los valores del JSON
+            String paymentMethod = (String) requestBody.get("paymentMethod");
+            int totalProducts = (int) requestBody.get("totalProducts");
+            double price = ((Number) requestBody.get("price")).doubleValue();
+
+            // Llama al servicio para crear los detalles de la orden
+            orderDetailsService.createOrderDetailsForLastOrder(paymentMethod, totalProducts, price);
+
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

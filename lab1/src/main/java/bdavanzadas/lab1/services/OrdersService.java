@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
-import bdavanzadas.lab1.entities.OrderDetailsEntity;
+
 
 import bdavanzadas.lab1.services.UserService;
 
@@ -32,11 +32,7 @@ public class OrdersService {
     @Autowired
     private UserService userService;
 
-    private final OrderDetailsService orderDetailsService;
 
-    public OrdersService(OrderDetailsService orderDetailsService) {
-        this.orderDetailsService = orderDetailsService;
-    }
 
     @Transactional(readOnly = true)
     public List<OrdersEntity> getAllOrders() {
@@ -140,6 +136,13 @@ public class OrdersService {
         );
     }
 
+    // Método para obtener el ID del último pedido insertado
+    @Transactional(readOnly = true)
+    public Integer getLastInsertedOrderId() {
+        String sql = "SELECT id FROM orders ORDER BY id DESC LIMIT 1";
+        return jdbcTemplate.queryForObject(sql, Integer.class);
+    }
+
 
     //RF 04: tiempo promedio entre entrega y pedido por repartidor
     @Transactional
@@ -210,5 +213,13 @@ public class OrdersService {
     @Transactional(readOnly = true)
     public List<ProductEntity> findProductsByOrderId(int orderId) {
         return ordersRepository.findProductsByOrderId(orderId);
+    }
+
+    //GetAddressOfLoggedClient
+    @Transactional(readOnly = true)
+    public String getAddressOfLoggedClient() {
+        Long userId = userService.getAuthenticatedUserId();
+        String sql = "SELECT address FROM clients WHERE user_id = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, userId);
     }
 }

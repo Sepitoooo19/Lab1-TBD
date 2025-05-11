@@ -7,16 +7,16 @@ import bdavanzadas.lab1.repositories.OrderDetailsRepository;
 
 import java.util.List;
 
-
 @Service
 public class OrderDetailsService {
 
     private final OrderDetailsRepository orderDetailsRepository;
+    private final OrdersService ordersService; // Inyección del servicio de órdenes
 
-    public OrderDetailsService(OrderDetailsRepository orderDetailsRepository) {
+    public OrderDetailsService(OrderDetailsRepository orderDetailsRepository, OrdersService ordersService) {
         this.orderDetailsRepository = orderDetailsRepository;
+        this.ordersService = ordersService; // Inicialización del servicio de órdenes
     }
-
 
     @Transactional(readOnly = true)
     public List<OrderDetailsEntity> getAllOrderDetails() {
@@ -44,12 +44,23 @@ public class OrderDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public String findPaymentmethodUrgentOrders(){
+    public String findPaymentmethodUrgentOrders() {
         return orderDetailsRepository.findPaymentmethodUrgentOrders();
     }
 
+    @Transactional
+    public void createOrderDetailsForLastOrder(String paymentMethod, int totalProducts, double price) {
+        // Obtener el ID del último pedido insertado
+        int lastOrderId = ordersService.getLastInsertedOrderId();
 
+        // Crear los detalles de la orden
+        OrderDetailsEntity orderDetails = new OrderDetailsEntity();
+        orderDetails.setOrderId(lastOrderId);
+        orderDetails.setPaymentMethod(paymentMethod);
+        orderDetails.setTotalProducts(totalProducts);
+        orderDetails.setPrice(price);
 
-
-
+        // Guardar los detalles en la base de datos
+        orderDetailsRepository.save(orderDetails);
+    }
 }
