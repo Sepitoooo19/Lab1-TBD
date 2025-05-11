@@ -1,10 +1,8 @@
 package bdavanzadas.lab1.services;
 
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
-import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.DealerEntity;
 import bdavanzadas.lab1.entities.ProductEntity;
-import bdavanzadas.lab1.repositories.DealerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +11,9 @@ import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
 
 
-import bdavanzadas.lab1.services.UserService;
-
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class OrdersService {
@@ -170,13 +165,15 @@ public class OrdersService {
         return result;
     }
 
-    public void markAsDelivered(int orderId) {
-        String sql = "UPDATE orders SET status = 'ENTREGADO' WHERE id = ?";
-        jdbcTemplate.update(sql, orderId);
+    @Transactional
+    public void markAsDelivered(int orderId, Date deliveryDate) {
+        String sql = "UPDATE orders SET status = 'ENTREGADO', delivery_date = ? WHERE id = ?";
+        jdbcTemplate.update(sql, deliveryDate, orderId);
     }
 
+    @Transactional
     public void markAsFailed(int orderId) {
-        String sql = "UPDATE orders SET status = 'FALLIDO' WHERE id = ?";
+        String sql = "UPDATE orders SET status = 'FALLIDA' WHERE id = ?";
         jdbcTemplate.update(sql, orderId);
     }
 
@@ -228,4 +225,60 @@ public class OrdersService {
         String sql = "UPDATE orders SET status = 'URGENTE' WHERE id = ?";
         jdbcTemplate.update(sql, orderId);
     }
+
+    @Transactional(readOnly = true)
+    public List<OrdersEntity> getOrdersByDealerId() {
+        // Obtener el userId del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+
+        // Obtener el dealerId asociado al userId
+        String sql = "SELECT id FROM dealers WHERE user_id = ?";
+        Integer dealerId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un dealer asociado al usuario con ID " + userId);
+        }
+
+        // Obtener los pedidos del dealer
+        return ordersRepository.findByDealerId(dealerId);
+    }
+
+    @Transactional(readOnly = true)
+    public OrdersEntity getActiveOrderByDealer() {
+        // Obtener el userId del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+
+        // Obtener el dealerId asociado al userId
+        String sql = "SELECT id FROM dealers WHERE user_id = ?";
+        Integer dealerId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un dealer asociado al usuario con ID " + userId);
+        }
+
+        // Obtener la orden activa del dealer
+        return ordersRepository.findActiveOrderByDealerId(dealerId);
+    }
+
+    @Transactional
+    public void assignOrderToDealer(int orderId) {
+        // Obtener dealerId del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+        Integer dealerId = jdbcTemplate.queryForObject(
+                "SELECT id FROM dealers WHERE user_id = ?",
+                Integer.class, userId
+        );
+
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un dealer asociado al usuario");
+        }
+
+        // Verificar que el dealer no tenga otra orden activa
+        OrdersEntity activeOrder = ordersRepository.findActiveOrderByDealerId(dealerId);
+        if (activeOrder != null) {
+            throw new IllegalStateException("El dealer ya tiene una orden activa");
+        }
+
+        // Asignar orden al dealer
+        ordersRepository.assignOrderToDealer(orderId, dealerId);
+    }
+
 }

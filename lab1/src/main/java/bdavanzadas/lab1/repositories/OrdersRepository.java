@@ -264,6 +264,38 @@ public class OrdersRepository implements OrdersRepositoryInt {
         return jdbcTemplate.queryForObject(sql, new Object[]{clientId}, Integer.class);
     }
 
+    // Obtener la orden En proceso por ID del repartidor
+    public OrdersEntity findActiveOrderByDealerId(int dealerId) {
+        String sql = "SELECT * FROM orders WHERE dealer_id = ? AND status = 'EN PROCESO'";
+        List<OrdersEntity> orders = jdbcTemplate.query(sql, new Object[]{dealerId}, (rs, rowNum) ->
+                new OrdersEntity(
+                        rs.getInt("id"),
+                        rs.getDate("order_date"),
+                        rs.getDate("delivery_date"),
+                        rs.getString("status"),
+                        rs.getInt("client_id"),
+                        rs.getInt("dealer_id"),
+                        rs.getDouble("total_price")
+                )
+        );
+        return orders.isEmpty() ? null : orders.get(0);
+    }
+
+    public void assignOrderToDealer(int orderId, int dealerId) {
+        String sql = "UPDATE orders SET dealer_id = ?, status = 'EN PROCESO' WHERE id = ?";
+        jdbcTemplate.update(sql, dealerId, orderId);
+    }
+
+    public void markAsDelivered(int orderId, String deliveryDate) {
+        String sql = "UPDATE orders SET status = 'ENTREGADO', delivery_date = ? WHERE id = ?";
+        jdbcTemplate.update(sql, deliveryDate, orderId);
+    }
+
+    public void markAsFailed(int orderId) {
+        String sql = "UPDATE orders SET status = 'FALLIDA' WHERE id = ?";
+        jdbcTemplate.update(sql, orderId);
+    }
+
 
 
 

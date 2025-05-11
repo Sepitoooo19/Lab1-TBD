@@ -3,11 +3,17 @@ package bdavanzadas.lab1.Controllers;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.entities.ProductEntity;
+import bdavanzadas.lab1.repositories.OrdersRepository;
+import bdavanzadas.lab1.services.DealerService;
 import bdavanzadas.lab1.services.OrdersService;
+import bdavanzadas.lab1.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +23,15 @@ import java.util.Map;
 public class OrdersController {
 
     private final OrdersService ordersService;
+
+    @Autowired
+    private OrdersRepository ordersRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UserService userService;
 
     public OrdersController(OrdersService ordersService) {
         this.ordersService = ordersService;
@@ -103,7 +118,7 @@ public class OrdersController {
 
     @PutMapping("/{id}/deliver")
     public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
-        ordersService.markAsDelivered(id);
+        ordersService.markAsDelivered(id, new Date());
         return ResponseEntity.ok("Pedido marcado como entregado");
 
 
@@ -204,6 +219,88 @@ public class OrdersController {
             return ResponseEntity.ok("Pedido marcado como URGENTE");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al marcar el pedido como URGENTE");
+        }
+    }
+
+    @GetMapping("/dealer/orders")
+    public ResponseEntity<List<OrdersEntity>> getOrdersByDealer() {
+        try {
+            List<OrdersEntity> orders = ordersService.getOrdersByDealerId();
+            return ResponseEntity.ok(orders); // Devuelve un array vacío si no hay pedidos
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // Devuelve 403 si hay un error de validación
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Devuelve 500 para errores inesperados
+        }
+    }
+
+    @GetMapping("/dealer/active-order")
+    public ResponseEntity<OrdersEntity> getActiveOrderByDealer() {
+        try {
+            System.out.println("Llamada al endpoint /dealer/active-order recibida");
+            OrdersEntity activeOrder = ordersService.getActiveOrderByDealer();
+            System.out.println("Orden activa encontrada: " + activeOrder);
+            return ResponseEntity.ok(activeOrder);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error de validación: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<Void> assignOrderToDealer(@PathVariable int id) {
+        try {
+            ordersService.assignOrderToDealer(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable int id,
+            @RequestBody Map<String, String> requestBody) {
+
+        try {
+            String newStatus = requestBody.get("status");
+
+            // Obtener dealerId del usuario autenticado
+            Long userId = userService.getAuthenticatedUserId();
+            Integer dealerId = jdbcTemplate.queryForObject(
+                    "SELECT id FROM dealers WHERE user_id = ?",
+                    Integer.class, userId
+            );
+
+            if (dealerId == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // Verificar que la orden pertenece al dealer
+            OrdersEntity order = ordersRepository.findById(id);
+            if (order == null || !dealerId.equals(order.getDealerId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // Actualizar estado
+            if ("ENTREGADO".equals(newStatus)) {
+                ordersService.markAsDelivered(id, new Date());
+            } else if ("FALLIDA".equals(newStatus)) {
+                ordersService.markAsFailed(id);
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
