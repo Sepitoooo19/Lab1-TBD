@@ -107,7 +107,7 @@ public class OrdersService {
     }*/
 
     // Método para crear una orden y asociar productos mediante procedimiento almacenado
-    // * USAR ESTA FUNCION EN VEZ DE createOrderWithProducts?
+
     public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
 
         Long userId = userService.getAuthenticatedUserId();
