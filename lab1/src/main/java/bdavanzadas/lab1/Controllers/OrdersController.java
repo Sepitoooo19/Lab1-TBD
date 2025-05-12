@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 import java.util.Date;
 import java.util.List;
@@ -125,8 +126,6 @@ public class OrdersController {
     public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
         ordersService.markAsDelivered(id, new Date());
         return ResponseEntity.ok("Pedido marcado como entregado");
-
-
     }
 
     // Endpoint para obtener pedidos fallidos por ID de la empresa
@@ -315,7 +314,6 @@ public class OrdersController {
         }
     }
 
-
     @GetMapping("/dealer/dto/orders")
     public ResponseEntity<List<OrderTotalProductsDTO>> getOrdersByDealerDto() {
         try {
@@ -341,10 +339,15 @@ public class OrdersController {
         }
     }
 
+    @GetMapping("/client/failed")
+    public ResponseEntity<List<OrdersEntity>> getFailedOrdersByClient() {
+        Long userId = userService.getAuthenticatedUserId();
+        String sql = "SELECT id FROM clients WHERE user_id = ?";
+        Integer clientId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
 
+        String query = "SELECT * FROM orders WHERE client_id = ? AND status = 'FALLIDA' ORDER BY order_date DESC";
+        List<OrdersEntity> failedOrders = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrdersEntity.class), clientId);
 
-
-
-
-
+        return ResponseEntity.ok(failedOrders);
+    }
 }
