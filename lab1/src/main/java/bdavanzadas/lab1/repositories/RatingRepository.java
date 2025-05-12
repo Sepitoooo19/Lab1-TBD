@@ -15,7 +15,7 @@ public class RatingRepository implements RatingRepositoryInt {
     private JdbcTemplate jdbcTemplate;
 
     public List<RatingEntity> findAll() {
-        String sql = "SELECT * FROM rating";
+        String sql = "SELECT * FROM ratings";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new RatingEntity(
                         rs.getInt("id"),
@@ -31,22 +31,22 @@ public class RatingRepository implements RatingRepositoryInt {
     }
 
     public void save(RatingEntity rating) {
-        String sql = "INSERT INTO rating (rating, comment, date, client_id, dealer_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ratings (rating, comment, date, client_id, dealer_id, order_id) VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, rating.getRating(), rating.getComment(), rating.getDate(), rating.getClientId(), rating.getDealerId(), rating.getOrderId());
     }
 
     public void update(RatingEntity rating) {
-        String sql = "UPDATE rating SET rating = ?, comment = ?, date = ?, client_id = ?, dealer_id = ? WHERE id = ?";
+        String sql = "UPDATE ratings SET rating = ?, comment = ?, date = ?, client_id = ?, dealer_id = ?, order_id = ? WHERE id = ?";
         jdbcTemplate.update(sql, rating.getRating(), rating.getComment(), rating.getDate(), rating.getClientId(), rating.getDealerId(), rating.getId(), rating.getOrderId());
     }
 
     public void delete(int id) {
-        String sql = "DELETE FROM rating WHERE id = ?";
+        String sql = "DELETE FROM ratings WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
 
     public RatingEntity findById(int id) {
-        String sql = "SELECT * FROM rating WHERE id = ?";
+        String sql = "SELECT * FROM ratings WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) ->
                 new RatingEntity(
                         rs.getInt("id"),
@@ -61,7 +61,7 @@ public class RatingRepository implements RatingRepositoryInt {
     }
 
     public List<RatingEntity> findByClientId(int clientId) {
-        String sql = "SELECT * FROM rating WHERE client_id = ?";
+        String sql = "SELECT * FROM ratings WHERE client_id = ?";
         return jdbcTemplate.query(sql, new Object[]{clientId}, (rs, rowNum) ->
                 new RatingEntity(
                         rs.getInt("id"),
@@ -76,7 +76,7 @@ public class RatingRepository implements RatingRepositoryInt {
     }
 
     public List<RatingEntity> findByDealerId(int dealerId) {
-        String sql = "SELECT * FROM rating WHERE dealer_id = ?";
+        String sql = "SELECT * FROM ratings WHERE dealer_id = ?";
         return jdbcTemplate.query(sql, new Object[]{dealerId}, (rs, rowNum) ->
                 new RatingEntity(
                         rs.getInt("id"),

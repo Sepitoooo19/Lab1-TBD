@@ -72,4 +72,24 @@ public class RatingController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/dealer/ratings")
+    public ResponseEntity<?> getRatingsByAuthenticatedDealer() {
+        try {
+            List<RatingEntity> ratings = ratingService.getRatingsByDealerIdAuthenticated();
+            if (ratings != null && !ratings.isEmpty()) {
+                return ResponseEntity.ok(ratings);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontraron calificaciones para el dealer autenticado.");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al obtener las calificaciones.");
+        }
+    }
+
+
+
+
 }

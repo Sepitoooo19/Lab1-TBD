@@ -111,11 +111,6 @@ public class OrdersController {
         }
     }
 
-    @GetMapping("/ObtenerPromedioEntregas")
-    public List<List<Object>> obtenerPromedioTiempoEntregaPorRepartidor(){
-        return  ordersService.obtenerPromedioTiempoEntregaPorRepartidor();
-    }
-
     @PutMapping("/{id}/deliver")
     public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
         ordersService.markAsDelivered(id, new Date());

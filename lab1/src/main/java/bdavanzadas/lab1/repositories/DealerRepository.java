@@ -2,10 +2,12 @@ package bdavanzadas.lab1.repositories;
 
 import bdavanzadas.lab1.entities.DealerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class DealerRepository  implements DealerRepositoryInt {
@@ -57,9 +59,59 @@ public class DealerRepository  implements DealerRepositoryInt {
         });
     }
 
-    //RF 05 TOP 3 MEJORES REPARTIDORES
-    public Float puntuacionProm(int id){
-        String sql = "SELECT AVG(rating) FROM rating WHERE dealer_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, Float.class);
+    //RF 04: tiempo promedio entre entrega y pedido por repartidor
+    public List<Map<String, Object>> getAverageDeliveryTimeByDealer() {
+        String sql = """
+            SELECT 
+                d.id AS dealer_id,
+                d.name AS dealer_name,
+                AVG(EXTRACT(EPOCH FROM (o.delivery_date - o.order_date)) / 3600) AS avg_delivery_time_hours
+            FROM 
+                orders o
+            JOIN 
+                dealers d ON o.dealer_id = d.id
+            WHERE 
+                o.status = 'ENTREGADO' AND o.delivery_date IS NOT NULL
+            GROUP BY 
+                d.id, d.name
+            ORDER BY 
+                avg_delivery_time_hours ASC;
+        """;
+
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public String findDealerNameById(int dealerId) {
+        String sql = "SELECT name FROM dealers WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{dealerId}, String.class);
+        } catch (EmptyResultDataAccessException e) {
+            return "Sin asignar"; // Si no se encuentra el dealer, devuelve "Sin asignar"
+        }
+    }
+
+    //RF 05: tres mejores repartidores
+    public List<Map<String, Object>> getTopPerformingDealers() {
+        String sql = """
+            SELECT 
+                d.id AS dealer_id,
+                d.name AS dealer_name,
+                COUNT(o.id) AS total_deliveries,
+                COALESCE(AVG(r.rating), 0) AS avg_rating,
+                (COUNT(o.id) * 0.7 + COALESCE(AVG(r.rating), 0) * 0.3) AS performance_score
+            FROM 
+                dealers d
+            LEFT JOIN 
+                orders o ON d.id = o.dealer_id AND o.status = 'ENTREGADO'
+            LEFT JOIN 
+                ratings r ON d.id = r.dealer_id
+            GROUP BY 
+                d.id, d.name
+            ORDER BY 
+                performance_score DESC
+            LIMIT 3;
+        """;
+
+        return jdbcTemplate.queryForList(sql);
     }
 }

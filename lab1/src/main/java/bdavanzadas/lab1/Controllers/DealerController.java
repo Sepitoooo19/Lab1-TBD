@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/dealers")
@@ -61,9 +62,22 @@ public class DealerController {
         }
     }
 
-    @GetMapping("/MejoresRepartidores")
-    public List<List<Object>> obtenerMejoresRepartidores(){
-        return dealerService.obtenerTop3Repartidores();
+    @GetMapping("/average-delivery-time")
+    public ResponseEntity<List<Map<String, Object>>> getAverageDeliveryTimeByDealer() {
+        List<Map<String, Object>> result = dealerService.getAverageDeliveryTimeByDealer();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}/name")
+    public ResponseEntity<String> getDealerNameById(@PathVariable("id") Integer dealerId) {
+        String dealerName = dealerService.getDealerNameById(dealerId);
+        return ResponseEntity.ok(dealerName);
+    }
+
+    @GetMapping("/top-performers")
+    public ResponseEntity<List<Map<String, Object>>> getTopPerformingDealers() {
+        List<Map<String, Object>> topDealers = dealerService.getTopPerformingDealers();
+        return ResponseEntity.ok(topDealers);
     }
 
 

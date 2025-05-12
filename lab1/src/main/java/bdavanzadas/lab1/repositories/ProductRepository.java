@@ -85,6 +85,8 @@ public class ProductRepository {
         return jdbcTemplate.queryForList(sql, String.class);
     }
 
+
+    //RF 02: productos más vendidos por categoría en el último mes
     public List<Map<String, Object>> findTopProductsByCategoryForLastMonth() {
         String sql = """
             SELECT 

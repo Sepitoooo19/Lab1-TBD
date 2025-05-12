@@ -85,6 +85,8 @@ public class CompanyRepository {
         jdbcTemplate.update(sql,id);
    }
 
+
+   //RF 3: empresas con más entregas fallidas
     public List<CompanyEntity> getCompaniesWithMostFailedDeliveries() {
         String sql = """
         SELECT 

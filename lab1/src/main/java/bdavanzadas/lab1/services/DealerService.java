@@ -10,6 +10,7 @@ import bdavanzadas.lab1.repositories.DealerRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DealerService {
@@ -39,29 +40,23 @@ public class DealerService {
         dealerRepository.delete(id);
     }
 
-    //RF 05 TOP 3 MEJORES REPARTIDORES
-    public List<List<Object>> obtenerTop3Repartidores(){
-        List<DealerEntity> dealers= dealerRepository.findAll();
-        List<List<Object>> result=new ArrayList<>();
-        float tiempoprom=0;
-        float ratingprom=0;
-        float totalprom=0;
-        for (DealerEntity dealer : dealers) {
-            int id=dealer.getId();
-            tiempoprom=ordersRepository.obtenerTiempoPromedioHoras(id);
-            ratingprom=dealerRepository.puntuacionProm(id);
-            totalprom=(tiempoprom+ratingprom)/2;
-            List<Object> dealerResult=new ArrayList<>();
-            dealerResult.add(id);
-            dealerResult.add(tiempoprom);
-            result.add(dealerResult);
+    public String getDealerNameById(Integer dealerId) {
+        if (dealerId == null) {
+            return "Sin asignar"; // Si el dealerId es null, devuelve "Sin asignar"
         }
-        // Ordenar los resultados según el rendimiento (totalprom) en orden descendente
-        result.sort((a, b) -> Float.compare((float) b.get(1), (float) a.get(1)));
+        return dealerRepository.findDealerNameById(dealerId);
+    }
 
-        // Retornar solo los 3 mejores repartidores (o menos si hay menos)
-        return result.size() > 3 ? result.subList(0, 3) : result;
+    //RF 05 TOP 3 MEJORES REPARTIDORES
+    public List<Map<String, Object>> getTopPerformingDealers() {
+        return dealerRepository.getTopPerformingDealers();
     }
 
 
+    public List<Map<String, Object>> getAverageDeliveryTimeByDealer() {
+        return dealerRepository.getAverageDeliveryTimeByDealer();
+    }
 }
+
+
+

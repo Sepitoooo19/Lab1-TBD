@@ -14,6 +14,7 @@ import bdavanzadas.lab1.repositories.OrdersRepository;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrdersService {
@@ -139,31 +140,7 @@ public class OrdersService {
     }
 
 
-    //RF 04: tiempo promedio entre entrega y pedido por repartidor
-    @Transactional
-    public List<List<Object>> obtenerPromedioTiempoEntregaPorRepartidor() {
-        // Lista donde se almacenarán los resultados
-        List<List<Object>> result = new ArrayList<>();
 
-        // Obtener todos los repartidores
-        List<DealerEntity> dealers = dealerService.getAllDealers();  // Asegúrate de tener este método en DealerService
-
-        // Recorrer cada repartidor
-        for (DealerEntity dealer : dealers) {
-            // Obtener el tiempo promedio de entrega para cada repartidor
-            float tiempoPromedio = ordersRepository.obtenerTiempoPromedioHoras(dealer.getId());
-
-            // Crear una sublista con el ID del repartidor y su tiempo promedio de entrega
-            List<Object> dealerResult = new ArrayList<>();
-            dealerResult.add(dealer.getId());  // ID del repartidor
-            dealerResult.add(tiempoPromedio);  // Tiempo promedio en horas
-
-            // Añadir la sublista a la lista de resultados
-            result.add(dealerResult);
-        }
-
-        return result;
-    }
 
     @Transactional
     public void markAsDelivered(int orderId, Date deliveryDate) {

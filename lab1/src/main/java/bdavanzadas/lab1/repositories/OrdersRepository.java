@@ -112,6 +112,8 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+
+    //RF 1: obtener el cliente que más ha gastado
     public TopSpenderDTO getTopSpender() {
         String sql = """
         SELECT c.id, c.name, c.rut, c.email, c.phone, c.address, SUM(o.total_price) AS total_spent
@@ -150,11 +152,6 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
-    //RF 04: tiempo promedio entre entrega y pedido por repartidor
-    public float obtenerTiempoPromedioHoras(int id) {
-        String sql = "SELECT AVG(EXTRACT(EPOCH FROM (delivery_date - order_date)) / 3600) FROM orders WHERE dealer_id = ? AND delivery_date IS NOT NULL AND order_date IS NOT NULL";
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, Float.class);
-    }
 
     public List<OrdersEntity> findFailedOrdersByCompanyId(int companyId) {
         String sql = """
