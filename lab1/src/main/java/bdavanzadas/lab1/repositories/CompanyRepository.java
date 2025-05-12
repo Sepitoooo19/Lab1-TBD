@@ -97,13 +97,14 @@ public class CompanyRepository {
             c.address,
             c.rut,
             c.type,
-            c.deliveries,
-            c.failed_deliveries,
-            c.total_sales
+            COUNT(o.id) AS deliveries, -- Total de entregas
+            SUM(CASE WHEN o.status = 'FALLIDA' THEN 1 ELSE 0 END) AS failed_deliveries, -- Total de entregas fallidas
+            SUM(o.total_price) AS total_sales -- Total de ventas
         FROM 
             companies c
-        ORDER BY 
-            c.failed_deliveries DESC
+        LEFT JOIN orders o ON c.id = o.client_id -- Relación entre empresas y pedidos
+        GROUP BY 
+            c.id, c.name, c.email, c.phone, c.address, c.rut, c.type
     """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) ->
@@ -115,9 +116,9 @@ public class CompanyRepository {
                         rs.getString("address"),
                         rs.getString("rut"),
                         rs.getString("type"),
-                        rs.getInt("deliveries"),
-                        rs.getInt("failed_deliveries"),
-                        rs.getInt("total_sales")
+                        rs.getInt("deliveries"), // Total de entregas
+                        rs.getInt("failed_deliveries"), // Total de entregas fallidas
+                        rs.getInt("total_sales") // Total de ventas
                 )
         );
     }
