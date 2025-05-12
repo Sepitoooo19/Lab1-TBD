@@ -7,6 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
+/**
+ *
+ *  La clase ClientEntity representa la entidad de cliente en la base de datos.
+ *  Esta clase contiene información básica sobre el cliente, como su nombre, RUT, correo electrónico, teléfono y dirección.
+ *  También incluye una relación con la entidad UserEntity para gestionar la autenticación y autorización del cliente.
+ *
+ */
 public class ClientEntity {
     private int id;
     private String name;

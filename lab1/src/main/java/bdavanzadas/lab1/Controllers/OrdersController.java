@@ -20,31 +20,68 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * La clase OrdersController maneja las solicitudes relacionadas con los pedidos.
+ * Esta clase contiene métodos para obtener, crear, actualizar y eliminar pedidos en la base de datos.
+ */
 @RestController
 @RequestMapping("/orders")
 @CrossOrigin(origins = "*") // Permite llamadas desde tu frontend Nuxt
 public class OrdersController {
 
+    /**
+     * Servicio de pedidos.
+     * Este servicio se utiliza para interactuar con la base de datos de pedidos.
+     */
     private final OrdersService ordersService;
 
+    /**
+     * Repositorio de pedidos.
+     * Este repositorio se utiliza para realizar operaciones CRUD en la base de datos de pedidos.
+     */
     @Autowired
     private OrdersRepository ordersRepository;
 
+    /**
+     * jdbc sirve para ejecutar consultas SQL directas.
+     * Este objeto se utiliza para ejecutar consultas SQL en la base de datos.
+     */
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+
+    /**
+     * Servicio de dealers.
+     * Este servicio se utiliza para interactuar con la base de datos de dealers.
+     */
     @Autowired
     private UserService userService;
 
+
+    /**
+     * Constructor de la clase OrdersController.
+     * @param ordersService El servicio de pedidos a utilizar.
+     */
     public OrdersController(OrdersService ordersService) {
         this.ordersService = ordersService;
     }
-    // CRUD BASICO
+
+
+    /**
+     * Endpoint para obtener todos los pedidos.
+     * Este endpoint devuelve una lista de todos los pedidos en la base de datos.
+     */
     @GetMapping
     public ResponseEntity<List<OrdersEntity>> getAllOrders() {
         return ResponseEntity.ok(ordersService.getAllOrders());
     }
 
+
+    /**
+     * Endpoint para obtener un pedido por su ID.
+     * Este endpoint devuelve un pedido específico basado en su ID.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<OrdersEntity> getOrderById(@PathVariable int id) {
         OrdersEntity order = ordersService.getOrderById(id);
@@ -54,12 +91,22 @@ public class OrdersController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    /**
+     * Endpoint para crear un nuevo pedido.
+     * Este endpoint guarda un nuevo pedido en la base de datos.
+     */
     @PostMapping
     public ResponseEntity<Void> addOrder(@RequestBody OrdersEntity order) {
         ordersService.addOrder(order);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+
+    /**
+     * Endpoint para actualizar un pedido existente.
+     * Este endpoint actualiza un pedido existente en la base de datos.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateOrder(@PathVariable int id, @RequestBody OrdersEntity order) {
         order.setId(id);
@@ -67,6 +114,11 @@ public class OrdersController {
         return ResponseEntity.noContent().build();
     }
 
+
+    /**
+     * Endpoint para eliminar un pedido por su ID.
+     * Este endpoint elimina un pedido específico basado en su ID.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable int id) {
         ordersService.deleteOrder(id);
@@ -87,23 +139,33 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Devuelve 500 para errores inesperados
         }
     }
-    /** Pedidos de un cliente dado su ID explícito. */
+
+
+    /**
+     * Endpoint para obtener pedidos por ID de cliente.
+     * Este endpoint devuelve una lista de pedidos específicos basados en el ID del cliente.
+     */
     @GetMapping("/client/{id}")
     public ResponseEntity<List<OrdersEntity>> getOrdersByClientId(@PathVariable int id) {
         List<OrdersEntity> orders = ordersService.getOrdersByClientId(id);
         return ResponseEntity.ok(orders);
     }
-    /** Cliente con mayor gasto total. */
+
+
+    /**
+     * Endpoint para obtener el cliente que más ha gastado.
+     * Este endpoint devuelve el cliente que ha realizado el mayor gasto en pedidos.
+     */
     @GetMapping("/top-spender")
     public ResponseEntity<TopSpenderDTO> getTopSpender() {
         TopSpenderDTO topSpender = ordersService.getTopSpender();
         return ResponseEntity.ok(topSpender);
     }
+
+
     /**
-     * Crea un pedido y lo asocia a una lista de IDs de productos.
-     *
-     * @param order      entidad OrdersEntity (en el body).
-     * @param productIds IDs de productos (query param: ?productIds=1&productIds=2 ...).
+     * Endpoint para crear un pedido con productos.
+     * Este endpoint guarda un nuevo pedido en la base de datos y asocia productos a él.
      */
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(
@@ -121,29 +183,48 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la orden: " + e.getMessage());
         }
     }
-    /** Marca un pedido como entregado, registrando la fecha de entrega. */
+
+
+    /**
+     * Endpoint para marcar un pedido como entregado.
+     * Este endpoint actualiza el estado de un pedido a "ENTREGADO".
+     */
     @PutMapping("/{id}/deliver")
     public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
         ordersService.markAsDelivered(id, new Date());
         return ResponseEntity.ok("Pedido marcado como entregado");
     }
 
-    // Endpoint para obtener pedidos fallidos por ID de la empresa
+
+
+    /**
+     * Endpoint para marcar un pedido como fallido.
+     * Este endpoint actualiza el estado de un pedido a "FALLIDO".
+     */
     @GetMapping("/failed/company/{companyId}")
     public ResponseEntity<List<OrdersEntity>> getFailedOrdersByCompanyId(@PathVariable int companyId) {
         List<OrdersEntity> orders = ordersService.findFailedOrdersByCompanyId(companyId);
         return ResponseEntity.ok(orders);
     }
 
-    // Endpoint para obtener pedidos entregados por ID de la empresa
+
+
+    /**
+     * Endpoint para obtener los pedidos entregados por ID de empresa.
+     * Este endpoint devuelve una lista de pedidos entregados específicos basados en el ID de la empresa.
+     */
     @GetMapping("/delivered/company/{companyId}")
     public ResponseEntity<List<OrdersEntity>> getDeliveredOrdersByCompanyId(@PathVariable int companyId) {
         List<OrdersEntity> orders = ordersService.findDeliveredOrdersByCompanyId(companyId);
         return ResponseEntity.ok(orders);
     }
 
-    //Endpoint para obtener los pedidos por el ID de la empresa
 
+
+    /**
+     * Endpoint para obtener los pedidos por ID de empresa.
+     * Este endpoint devuelve una lista de pedidos específicos basados en el ID de la empresa.
+     */
     @GetMapping("/company/{companyId}")
     public ResponseEntity<List<OrdersEntity>> getOrdersByCompanyId(@PathVariable int companyId) {
         List<OrdersEntity> orders = ordersService.findOrdersByCompanyId(companyId);
@@ -155,6 +236,11 @@ public class OrdersController {
     }
 
 
+
+    /**
+     * Endpoint para obtener los pedidos por ID de dealer.
+     * Este endpoint devuelve una lista de pedidos específicos basados en el ID del dealer.
+     */
     @GetMapping("/dealer/{id}")
     public ResponseEntity<List<OrdersEntity>> getOrdersByDealerId(@PathVariable int id) {
         List<OrdersEntity> orders = ordersService.getOrdersByDealerId(id);
@@ -181,7 +267,12 @@ public class OrdersController {
         ordersService.updateOrderStatusByDealerId(id, dealerId, requestBody.get("status"));
         return ResponseEntity.noContent().build();
     }
-    /** Devuelve los productos asociados a una orden. */
+
+
+    /**
+     * Endpoint para obtener los productos por ID de pedido.
+     * Este endpoint devuelve una lista de productos específicos basados en el ID del pedido.
+     */
     @GetMapping("/{orderId}/products")
     public ResponseEntity<List<ProductEntity>> getProductsByOrderId(@PathVariable int orderId) {
         try {
@@ -195,7 +286,12 @@ public class OrdersController {
         }
     }
 
-    //    getLastInsertedOrderId
+
+
+    /**
+     * Endpoint para obtener el último ID de pedido insertado.
+     * Este endpoint devuelve el ID del último pedido insertado en la base de datos.
+     */
     @GetMapping("/last-inserted")
     public ResponseEntity<Integer> getLastInsertedOrderId() {
         try {
@@ -208,7 +304,12 @@ public class OrdersController {
     }
 
 
-    //getAddressOfLoggedClient
+
+
+    /**
+     * Endpoint para obtener la dirección del cliente autenticado.
+     * Este endpoint devuelve la dirección del cliente autenticado en la base de datos.
+     */
     @GetMapping("/address")
     public ResponseEntity<String> getAddressOfLoggedClient() {
         try {
@@ -218,7 +319,13 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    /** Marca un pedido como URGENTE. */
+
+
+
+    /**
+     * Endpoint para marcar un pedido como urgente.
+     * Este endpoint actualiza el estado de un pedido a "URGENTE".
+     */
     @PutMapping("/{id}/urgent")
     public ResponseEntity<String> markOrderAsUrgent(@PathVariable int id) {
         try {
@@ -228,7 +335,12 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al marcar el pedido como URGENTE");
         }
     }
-    /** Pedidos asignados al dealer autenticado (array vacío si no hay). */
+
+
+    /**
+     * Endpoint para obtener los pedidos por ID de dealer.
+     * Este endpoint devuelve una lista de pedidos específicos basados en el ID del dealer.
+     */
     @GetMapping("/dealer/orders")
     public ResponseEntity<List<OrdersEntity>> getOrdersByDealer() {
         try {
@@ -240,7 +352,11 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Devuelve 500 para errores inesperados
         }
     }
-    /** Orden activa (no finalizada) asignada al dealer autenticado. */
+
+    /**
+     * Endpoint para obtener la orden activa del dealer autenticado.
+     * Este endpoint devuelve la orden activa del dealer autenticado en la base de datos.
+     */
     @GetMapping("/dealer/active-order")
     public ResponseEntity<OrdersEntity> getActiveOrderByDealer() {
         try {
@@ -256,7 +372,12 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    /** Asigna una orden libre al dealer autenticado. */
+
+
+    /**
+     * Endpoint para asignar un pedido a un dealer.
+     * Este endpoint asigna un pedido específico a un dealer basado en su ID.
+     */
     @PutMapping("/{id}/assign")
     public ResponseEntity<Void> assignOrderToDealer(@PathVariable int id) {
         try {
@@ -270,9 +391,11 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     /**
-     * Actualiza el estado de una orden (ENTREGADO/FALLIDA) verificando que
-     * el dealer autenticado sea dueño de la misma.
+     * Endpoint para actualizar el estado de un pedido.
+     * Este endpoint actualiza el estado de un pedido específico basado en su ID.
      */
     @PutMapping("/{id}/status")
     public ResponseEntity<Void> updateOrderStatus(
@@ -314,6 +437,11 @@ public class OrdersController {
         }
     }
 
+
+    /**
+     * Endpoint para obtener los pedidos con el conteo de productos por dealer.
+     * Este endpoint devuelve una lista de pedidos con el conteo de productos específicos basados en el ID del dealer.
+     */
     @GetMapping("/dealer/dto/orders")
     public ResponseEntity<List<OrderTotalProductsDTO>> getOrdersByDealerDto() {
         try {
@@ -326,6 +454,10 @@ public class OrdersController {
         }
     }
 
+    /**
+     * Endpoint para obtener la dirección y nombre de la orden activa del dealer autenticado.
+     * Este endpoint devuelve la dirección y nombre de la orden activa del dealer autenticado en la base de datos.
+     */
     @GetMapping("/dealer/dto/active-order")
     public ResponseEntity<OrderNameAddressDTO> getActiveOrderNameAddressByDealer() {
         try {
@@ -339,6 +471,11 @@ public class OrdersController {
         }
     }
 
+
+    /**
+     * Endpoint para obtener los pedidos fallidos por ID de cliente.
+     * Este endpoint devuelve una lista de pedidos fallidos específicos basados en el ID del cliente.
+     */
     @GetMapping("/client/failed")
     public ResponseEntity<List<OrdersEntity>> getFailedOrdersByClient() {
         Long userId = userService.getAuthenticatedUserId();

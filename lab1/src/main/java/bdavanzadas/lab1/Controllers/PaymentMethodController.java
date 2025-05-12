@@ -9,10 +9,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+/**
+ *
+ * La clase PaymentMethodController maneja las solicitudes relacionadas con los métodos de pago.
+ * Esta clase contiene métodos para obtener, crear, actualizar y eliminar métodos de pago en la base de datos.
+ *
+ *
+ * */
 @RestController
 @RequestMapping("/paymentmethod")
 @CrossOrigin(origins = "*")
 public class PaymentMethodController {
+
+    /**
+     *
+     * Servicio de métodos de pago.
+     * Este servicio se utiliza para interactuar con la base de datos de métodos de pago.
+     *
+     * */
     @Autowired
     private PaymentMethodService service;
 
@@ -20,46 +35,65 @@ public class PaymentMethodController {
     // ENDPOINTS CRUD
     // -----------------------------------------------------------------
 
-    /** Obtiene todos los métodos de pago existentes. */
+
+
+
+
+    /**
+     * Endpoint para obtener todos los métodos de pago.
+     * Este endpoint devuelve una lista de todos los métodos de pago en la base de datos.
+     * */
     @GetMapping("/obtenertodos")
     public List<PaymentMethodEntity> getAll() {
         return service.getallPaymentMethods();
     }
 
-    /** Obtiene un método de pago por su ID. */
+
+    /**
+     * Endpoint para obtener un método de pago por su ID.
+     * Este endpoint devuelve un método de pago específico basado en su ID.
+     * */
     @GetMapping("/obtenerbyid/{id}")
     public PaymentMethodEntity getById(@PathVariable int id) {
         return service.getPaymentMethodById(id);
     }
 
-    /** Obtiene un método de pago por su tipo (e.g., 'TARJETA', 'EFECTIVO'). */
+
+    /**
+     * Endpoint para obtener un método de pago por su tipo.
+     * Este endpoint devuelve un método de pago específico basado en su tipo.
+     * */
     @GetMapping("/obtenerbytype/{type}")
     public PaymentMethodEntity getByType(@PathVariable String type) {
         return service.getPaymentMethodByType(type);
     }
 
-    /** Crea un nuevo método de pago. Devuelve 201 CREATED. */
+
+    /**
+     * Endpoint para crear un nuevo método de pago.
+     * Este endpoint guarda un nuevo método de pago en la base de datos.
+     * */
     @PostMapping("/crear")
     public ResponseEntity<Void> create(@RequestBody PaymentMethodEntity p) {
         service.savePaymentMethod(p);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+
     /**
-     * Actualiza un método de pago existente.
-     * <p>Conviene usar {@code @PutMapping} semánticamente,
-     * pero se mantiene {@code @PostMapping} según el código original.</p>
-     */
+     * Endpoint para actualizar un método de pago existente.
+     * Este endpoint actualiza un método de pago existente en la base de datos.
+     * */
     @PostMapping("/update")
     public void update(@RequestBody PaymentMethodEntity p) {
         service.updatePaymentMethod(p);
     }
 
+
     /**
-     * Elimina un método de pago por ID.
-     * <p>También podría ser un {@code @DeleteMapping} para seguir
-     * las convenciones REST.</p>
-     */
+     * Endpoint para eliminar un método de pago.
+     * Este endpoint elimina un método de pago específico basado en su ID.
+     * */
     @PostMapping("/delete/{id}")
     public void delete(@PathVariable int id) {
         service.deletePaymentMethod(id);
@@ -69,7 +103,11 @@ public class PaymentMethodController {
     // CONSULTAS ESPECÍFICAS
     // -----------------------------------------------------------------
 
-    /** Métodos de pago asociados a una empresa específica. */
+
+    /**
+     * Endpoint para obtener los métodos de pago por ID de compañía.
+     * Este endpoint devuelve una lista de métodos de pago específicos basados en el ID de la compañía.
+     * */
     @GetMapping("/company/{companyId}")
     public List<PaymentMethodEntity> getByCompanyId(@PathVariable int companyId) {
         return service.getPaymentMethodsByCompanyId(companyId);

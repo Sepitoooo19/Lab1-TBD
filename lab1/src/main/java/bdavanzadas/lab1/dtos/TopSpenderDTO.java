@@ -9,7 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-// Esta clase es un DTO (Data Transfer Object) que representa a un cliente con el mayor gasto total en la tienda.
+/**
+ *
+ *  La clase TopSpenderDTO representa un objeto de transferencia de datos (DTO) que contiene información sobre el cliente que más ha gastado.
+ *  Esta clase incluye detalles como el ID del cliente, su nombre, RUT, correo electrónico, teléfono, dirección y el total gastado.
+ *
+ */
 public class TopSpenderDTO {
     private int id;
     private String name;

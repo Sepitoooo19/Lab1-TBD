@@ -12,11 +12,32 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Map;
 
+
+
+/**
+ *
+ * La clase UserRepository representa el repositorio de usuarios en la base de datos.
+ * Esta clase contiene métodos para guardar y buscar usuarios en la base de datos.
+ * */
+
 @Repository
-public class UserRepository {
+public class UserRepository implements UserRepositoryInt {
+
+
+    /**
+     * JdbcTemplate es una clase de Spring que simplifica el acceso a la base de datos.
+     * Se utiliza para ejecutar consultas SQL y mapear los resultados a objetos Java.
+     */
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Metodo para encontrar un usuario por su username
+     * @param "username" El username del usuario a buscar.
+     * @return El usuario encontrado.
+     *
+     *
+     * */
     public UserEntity findByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
         try {
@@ -32,6 +53,21 @@ public class UserRepository {
         }
     }
 
+
+    /**
+     * Metodo para guardar un usuario en la base de datos.
+     *
+     * Lo que realiza por dentro es lo siguiente:
+     * 1. Prepara la consulta SQL para insertar un nuevo usuario en la tabla "users".
+     * 2. Utiliza un KeyHolder para obtener la clave generada automáticamente (ID) después de la inserción.
+     * 3. Ejecuta la consulta de inserción utilizando el JdbcTemplate y el KeyHolder.
+     * 4. Si la inserción es exitosa, se obtiene el ID generado y se establece en el objeto UserEntity.
+     * @param "user" El usuario a guardar.
+     *
+     * @return void
+     *
+     *
+     * */
     public void save(UserEntity user) {
         String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();

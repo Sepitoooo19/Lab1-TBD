@@ -10,21 +10,57 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ *
+ * La clase OrderDetailsController maneja las solicitudes relacionadas con los detalles de las órdenes.
+ * Esta clase contiene métodos para obtener, crear, actualizar y eliminar detalles de órdenes en la base de datos.
+ *
+ *
+ * */
 @RestController
 @RequestMapping("/order-details")
 @CrossOrigin(origins = "*") // Permite llamadas desde tu frontend Nuxt
 public class OrderDetailsController {
 
+
+    /**
+     *
+     * Servicio de detalles de órdenes.
+     * Este servicio se utiliza para interactuar con la base de datos de detalles de órdenes.
+     *
+     * */
     private final OrderDetailsService orderDetailsService;
+
+    /**
+     *
+     * Constructor de la clase OrderDetailsController.
+     * @param "orderDetailsService" El servicio de detalles de órdenes a utilizar.
+     *
+     * */
     public OrderDetailsController(OrderDetailsService orderDetailsService) {
         this.orderDetailsService = orderDetailsService;
     }
-    // CRUD BÁSICO
+
+
+    /**
+     *
+     * Endpoint para obtener todos los detalles de órdenes.
+     * Este endpoint devuelve una lista de todos los detalles de órdenes en la base de datos.
+     *
+     * */
     @GetMapping
     public ResponseEntity<List<OrderDetailsEntity>> getAllOrderDetails() {
         return ResponseEntity.ok(orderDetailsService.getAllOrderDetails());
     }
 
+
+    /**
+     *
+     * Endpoint para obtener un detalle de orden por su ID.
+     * Este endpoint devuelve un detalle de orden específico basado en su ID.
+     *
+     * */
     @GetMapping("/{id}")
     public ResponseEntity<OrderDetailsEntity> getOrderDetailById(@PathVariable int id) {
         OrderDetailsEntity orderDetail = orderDetailsService.getOrderDetailsById(id);
@@ -35,12 +71,26 @@ public class OrderDetailsController {
         }
     }
 
+
+    /**
+     *
+     * Endpoint para crear un nuevo detalle de orden.
+     * Este endpoint guarda un nuevo detalle de orden en la base de datos.
+     *
+     * */
     @PostMapping
     public ResponseEntity<Void> addOrderDetail(@RequestBody OrderDetailsEntity orderDetail) {
         orderDetailsService.saveOrderDetails(orderDetail);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+
+    /**
+     *
+     * Endpoint para actualizar un detalle de orden existente.
+     * Este endpoint actualiza un detalle de orden existente en la base de datos.
+     *
+     * */
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateOrderDetail(@PathVariable int id, @RequestBody OrderDetailsEntity orderDetail) {
         orderDetail.setId(id);
@@ -48,12 +98,27 @@ public class OrderDetailsController {
         return ResponseEntity.noContent().build();
     }
 
+
+
+    /**
+     *
+     * Endpoint para eliminar un detalle de orden.
+     * Este endpoint elimina un detalle de orden específico basado en su ID.
+     *
+     * */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrderDetail(@PathVariable int id) {
         orderDetailsService.deleteOrderDetails(id);
         return ResponseEntity.noContent().build();
     }
 
+
+    /**
+     *
+     * Endpoint para obtener detalles de orden por ID de orden.
+     * Este endpoint devuelve una lista de detalles de orden específicos basados en el ID de la orden.
+     *
+     * */
     @GetMapping("/order/{orderId}")
     public ResponseEntity<List<OrderDetailsEntity>> getOrderDetailsByOrderId(@PathVariable int orderId) {
         List<OrderDetailsEntity> orderDetails = orderDetailsService.getOrderDetailsByOrderId(orderId);

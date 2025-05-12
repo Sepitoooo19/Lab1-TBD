@@ -7,6 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
+/**
+ *
+ *  La clase CompanyEntity representa la entidad de empresa en la base de datos.
+ *  Esta clase contiene información básica sobre la empresa, como su nombre, correo electrónico, teléfono y dirección.
+ *  También incluye información adicional como el RUT, tipo de empresa, número de entregas, entregas fallidas y total de ventas.
+ *
+ */
 public class CompanyEntity {
     private int id;
     private String name;

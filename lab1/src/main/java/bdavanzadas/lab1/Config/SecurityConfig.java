@@ -21,6 +21,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
+
+/**
+ * Configuración de seguridad para la aplicación.
+ * Esta clase define las reglas de autorización y autenticación para las rutas de la API.
+ * Utiliza JWT para la autenticación y BCryptPasswordEncoder para el hash seguro de contraseñas.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -28,7 +34,7 @@ public class SecurityConfig {
     @Autowired
     private JwtUtil jwtUtil;
 
-    /*
+    /**
      - Define reglas de autorización:
      - Permite acceso público a rutas `/auth/**`, `/clients/**`, etc.
      - Restringe acceso a `/companies/**` a usuarios con roles ADMIN, CLIENT o DEALER
@@ -47,12 +53,26 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*Utiliza para el hash seguro de contraseñas `BCryptPasswordEncoder*/
+
+
+    /**
+     * Configura el codificador de contraseñas.
+     * Utiliza BCryptPasswordEncoder para el hash seguro de contraseñas.
+     *
+     * @return PasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+
+    /**
+     * Configura el filtro JWT.
+     * Este filtro se encarga de validar el token JWT en cada solicitud.
+     *
+     * @return OncePerRequestFilter
+     */
     public OncePerRequestFilter jwtFilter() {
         return new OncePerRequestFilter() {
             @Override

@@ -10,6 +10,13 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
+/**
+ *
+ *  La clase RatingEntity representa la entidad de calificación en la base de datos.
+ *  Esta clase contiene información básica sobre la calificación, como el ID, la calificación, el comentario, la fecha, el ID del cliente, el ID del distribuidor y el ID del pedido.
+ *
+ */
 public class RatingEntity {
     private int id;
     private int rating;

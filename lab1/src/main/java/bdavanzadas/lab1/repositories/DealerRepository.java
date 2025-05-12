@@ -9,25 +9,65 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
+
+
+/**
+ *
+ *  La clase DealerRepository representa el repositorio de repartidores en la base de datos.
+ *  Esta clase contiene métodos para guardar, actualizar, eliminar y buscar repartidores en la base de datos.
+ *
+ * */
 @Repository
 public class DealerRepository  implements DealerRepositoryInt {
 
+    /**
+     * JdbcTemplate es una clase de Spring que simplifica el acceso a la base de datos.
+     * Se utiliza para ejecutar consultas SQL y mapear los resultados a objetos Java.
+     */
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+
+    /**
+     * Metodo para guardar un dealer en la base de datos.
+     * @param "dealer" El dealer a guardar.
+     * @return void
+     *
+     */
     public void save(DealerEntity dealer) {
         String sql = "INSERT INTO dealers (user_id, name, rut, email, phone, vehicle, plate) VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, dealer.getUserId(), dealer.getName(), dealer.getRut(), dealer.getEmail(), dealer.getPhone(), dealer.getVehicle(), dealer.getPlate());
     }
 
+
+    /**
+     * Metodo para actualizar un dealer en la base de datos.
+     * @param "dealer" El dealer a actualizar.
+     * @return void
+     *
+     */
     public void update(DealerEntity dealer) {
         String sql = "UPDATE dealers SET name = ?, rut = ?, email = ?, phone = ?, vehicle = ?, plate = ? WHERE id = ?";
         jdbcTemplate.update(sql, dealer.getName(), dealer.getRut(), dealer.getEmail(), dealer.getPhone(), dealer.getVehicle(), dealer.getPlate(), dealer.getId());
     }
+
+    /**
+     * Metodo para eliminar un dealer de la base de datos.
+     * @param "id" El id del dealer a eliminar.
+     * @return void
+     *
+     */
     public void delete(int id) {
         String sql = "DELETE FROM dealers WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
+
+    /**
+     * Metodo para buscar un dealer por su id.
+     * @param "id" El id del dealer a buscar.
+     * @return El dealer encontrado.
+     *
+     */
     public DealerEntity findById(int id) {
         String sql = "SELECT * FROM dealers WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
@@ -44,6 +84,12 @@ public class DealerRepository  implements DealerRepositoryInt {
     }
 
 
+
+    /**
+     * Metodo para buscar todos los dealers.
+     * @return Una lista de todos los dealers.
+     *
+     */
     public List<DealerEntity> findAll() {
         String sql = "SELECT * FROM dealers";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -59,6 +105,14 @@ public class DealerRepository  implements DealerRepositoryInt {
         });
     }
 
+
+    /**
+     * Metodo para obtener el tiempo promedio de entrega por repartidor.
+     * Este método realiza una consulta SQL que calcula el tiempo promedio entre la fecha de pedido y la fecha de entrega para cada repartidor.
+     * El resultado se agrupa por el ID y nombre del repartidor, y se ordena de menor a mayor tiempo promedio.
+     * @return Una lista de mapas, donde cada mapa contiene el ID y nombre del repartidor, y el tiempo promedio de entrega en horas.
+     *
+     */
     //RF 04: tiempo promedio entre entrega y pedido por repartidor
     public List<Map<String, Object>> getAverageDeliveryTimeByDealer() {
         String sql = """
@@ -81,6 +135,13 @@ public class DealerRepository  implements DealerRepositoryInt {
         return jdbcTemplate.queryForList(sql);
     }
 
+
+    /**
+     * Metodo para buscar el nombre de un dealer por su id.
+     * @param "dealerId" El id del dealer a buscar.
+     * @return El nombre del dealer encontrado o "Sin asignar" si no se encuentra.
+     *
+     */
     public String findDealerNameById(int dealerId) {
         String sql = "SELECT name FROM dealers WHERE id = ?";
         try {
@@ -90,6 +151,15 @@ public class DealerRepository  implements DealerRepositoryInt {
         }
     }
 
+
+    /**
+     * Metodo para buscar los 3 mejores repartidores.
+     * Este método realiza una consulta SQL que calcula el puntaje de rendimiento de cada repartidor basado en el número de entregas y la calificación promedio.
+     * El puntaje se calcula como 70% del número de entregas y 30% de la calificación promedio.
+     * El resultado se agrupa por el ID y nombre del repartidor, y se ordena de mayor a menor puntaje.
+     * @return Una lista de mapas, donde cada mapa contiene el ID y nombre del repartidor, el total de entregas, la calificación promedio y el puntaje de rendimiento.
+     *
+     */
     //RF 05: tres mejores repartidores
     public List<Map<String, Object>> getTopPerformingDealers() {
         String sql = """
@@ -115,6 +185,15 @@ public class DealerRepository  implements DealerRepositoryInt {
         return jdbcTemplate.queryForList(sql);
     }
 
+
+    /**
+     * Metodo para obtener el tiempo promedio de entrega por repartidor autenticado.
+     * Este método realiza una consulta SQL que calcula el tiempo promedio entre la fecha de pedido y la fecha de entrega para el repartidor autenticado.
+     * El resultado se agrupa por el ID y nombre del repartidor, y se ordena de menor a mayor tiempo promedio.
+     * @param "userId" El id del usuario autenticado.
+     * @return El tiempo promedio de entrega en horas.
+     *
+     */
     public Double getAverageDeliveryTimeByAuthenticatedDealer(Long userId) {
         // Obtener el dealerId asociado al usuario autenticado
         String sqlDealerId = "SELECT id FROM dealers WHERE user_id = ?";
@@ -134,6 +213,14 @@ public class DealerRepository  implements DealerRepositoryInt {
         return jdbcTemplate.queryForObject(sqlAvgTime, new Object[]{dealerId}, Double.class);
     }
 
+
+    /**
+     * Metodo para contar el número de entregas realizadas por el repartidor autenticado.
+     * Este método realiza una consulta SQL que cuenta el número de entregas realizadas por el repartidor autenticado.
+     * @param "userId" El id del usuario autenticado.
+     * @return El número de entregas realizadas.
+     *
+     */
     public Integer getDeliveryCountByAuthenticatedDealer(Long userId) {
         // Obtener el dealerId asociado al usuario autenticado
         String sqlDealerId = "SELECT id FROM dealers WHERE user_id = ?";

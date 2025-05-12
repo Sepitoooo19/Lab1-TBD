@@ -10,10 +10,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+
+
+/**
+ *
+ * La clase ProductController maneja las solicitudes relacionadas con los productos.
+ * Esta clase contiene métodos para obtener, crear, actualizar y eliminar productos en la base de datos.
+ *
+ * */
 @RestController
 @RequestMapping("/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
+
+    /**
+     *
+     * Servicio de productos.
+     * Este servicio se utiliza para interactuar con la base de datos de productos.
+     *
+     * */
     @Autowired
     private ProductService service;
 
@@ -21,41 +36,66 @@ public class ProductController {
     // CRUD BÁSICO
     // -----------------------------------------------------------------
 
-    /** Devuelve todos los productos. */
+
+
+    /**
+     * Endpoint para obtener todos los productos.
+     * Este endpoint devuelve una lista de todos los productos en la base de datos.
+     * */
     @GetMapping("/obtenertodos")
     public List<ProductEntity> getAll() {
         return service.getAllProducts();
     }
 
-    /** Devuelve productos con stock disponible (&gt;0). */
+
+
+    /**
+     * Endpoint para obtener todos los productos por stock.
+     * Este endpoint devuelve una lista de todos los productos en la base de datos ordenados por stock.
+     * */
     @GetMapping("/obtenerporstock")
     public List<ProductEntity> getStock() {
         return service.getProductsByStock();
     }
 
-    /** Obtiene un producto por su ID. */
+
+
+    /**
+     * Endpoint para obtener un producto por su ID.
+     * Este endpoint devuelve un producto específico basado en su ID.
+     * */
     @GetMapping("/obtenerporid/{id}")
     public ProductEntity getById(@PathVariable int id) {
         return service.getProductById(id);
     }
 
-    /** Crea un nuevo producto. Devuelve 200 OK sin body (podrías usar 201 CREATED). */
+
+
+    /**
+     * Endpoint para obtener un producto por su nombre.
+     * Este endpoint devuelve un producto específico basado en su nombre.
+     * */
     @PostMapping("/crear")
     public void create(@RequestBody ProductEntity p) {
         service.saveProduct(p);
     }
 
+
     /**
-     * Actualiza un producto existente.
-     * <p>Se mantiene como POST para respetar tu implementación,
-     * aunque REST aconsejaría {@code PUT /{id}}.</p>
-     */
+     * Endpoint para actualizar un producto.
+     * Este endpoint actualiza un producto existente en la base de datos.
+     * */
     @PostMapping("/update")
     public void update(@RequestBody ProductEntity p) {
         service.updateProduct(p);
     }
 
-    /** Elimina un producto. (Igual comentario: lo típico sería {@code DELETE /{id}}). */
+
+
+    /**
+     * Endpoint para eliminar un producto por su ID.
+     * Este endpoint elimina un producto específico basado en su ID.
+     * */
     @PostMapping("/delete/{id}")
     public void delete(@PathVariable int id) {
         service.deleteProduct(id);
@@ -65,31 +105,43 @@ public class ProductController {
     // CONSULTAS ESPECÍFICAS
     // -----------------------------------------------------------------
 
-    /** Productos por categoría (string). */
+
+
+    /**
+     * Endpoint para obtener productos por categoría.
+     * Este endpoint devuelve una lista de productos específicos basados en su categoría.
+     * */
     @GetMapping("/obtenerporcategoria/{category}")
     public List<ProductEntity> getProductsByCategory(@PathVariable String category) {
         return service.getProductsByCategory(category);
     }
 
-    /** Lista de todas las categorías distintas disponibles. */
+
+    /**
+     * Endpoint para obtener todas las categorias
+     * Este endpoint devuelve una lista de todas las categorias en la base de datos.
+     * */
     @GetMapping("/categorias")
     public List<String> findallCategories() {
         return service.findallCategories();
     }
 
+
     /**
-     * Productos más vendidos/solicitados por categoría en el último mes.
-     *
-     * @return Lista de mapas con la siguiente estructura, por ejemplo:<br>
-     * {@code [{ "category": "Electrónica", "productId": 1, "total": 50 }, ...]}
-     */
+     * Endpoint para obtener los productos más vendidos por categoría en el último mes.
+     * Este endpoint devuelve una lista de productos más vendidos por categoría en el último mes.
+     * */
     @GetMapping("/top-by-category")
     public ResponseEntity<List<Map<String, Object>>> getTopProductsByCategoryForLastMonth() {
         List<Map<String, Object>> topProducts = service.getTopProductsByCategoryForLastMonth();
         return ResponseEntity.ok(topProducts);
     }
 
-    /** Productos pertenecientes a una empresa (company) específica. */
+
+    /**
+     * Endpoint para obtener productos por el ID de la compañía.
+     * Este endpoint devuelve una lista de productos específicos basados en el ID de la compañía.
+     * */
     @GetMapping("/company/{id}")
     public List<ProductEntity> getProductsByCompanyId(@PathVariable int id) {
         return service.getProductsByCompanyId(id);
@@ -99,7 +151,11 @@ public class ProductController {
     // UTILIDAD
     // -----------------------------------------------------------------
 
-    /** Devuelve el companyId (empresa propietaria) de un producto. */
+
+    /**
+     * Endpoint para obtener el ID de la compañía por el ID del producto.
+     * Este endpoint devuelve el ID de la compañía específica basada en el ID del producto.
+     * */
     @GetMapping("/companyid/{id}")
     public int getCompanyIdByProductId(@PathVariable int id) {
         return service.getCompanyIdByProductId(id);

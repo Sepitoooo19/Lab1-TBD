@@ -16,14 +16,30 @@ import java.util.List;
 import java.util.Map;
 
 
+
+/**
+ *
+ *  La clase OrdersRepository representa el repositorio de pedidos en la base de datos.
+ *  Esta clase contiene métodos para guardar, actualizar, eliminar y buscar pedidos en la base de datos.
+ *
+ */
 @Repository
 public class OrdersRepository implements OrdersRepositoryInt {
 
+
+    /**
+     * JdbcTemplate es una clase de Spring que simplifica el acceso a la base de datos.
+     * Se utiliza para ejecutar consultas SQL y mapear los resultados a objetos Java.
+     */
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private DealerRepository dealerRepository;
 
+
+    /**
+     * Metodo para obtener todos los orders de la base de datos.
+     * @return Una lista de orders.
+     *
+     */
     public List<OrdersEntity> findAll() {
         String sql = "SELECT * FROM orders";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
@@ -39,37 +55,48 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+    /**
+     * Metodo para guardar un order en la base de datos.
+     * @param "order" El order a guardar.
+     * @return void
+     *
+     */
     public void save(OrdersEntity order) {
         String sql = "INSERT INTO orders (order_date, delivery_date, status, client_id,dealer_id , total_price) VALUES (?, ?, ?, ?, ?,?)";
         jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(),order.getDealerId() ,order.getTotalPrice());
     }
 
-    // Método para guardar la relación entre la orden y los productos
-    public void saveOrderProducts(int orderId, List<Integer> productIds) {
-        String sql = "INSERT INTO order_products (order_id, product_id) VALUES (?, ?)";
 
-        // Insertar la relación entre la orden y los productos utilizando los IDs
-        for (Integer productId : productIds) {
-            jdbcTemplate.update(sql, orderId, productId);
-        }
-    }
 
+    /**
+     * Metodo para actualizar un order en la base de datos.
+     * @param "order" El order a actualizar.
+     * @return void
+     *
+     */
     public void update(OrdersEntity order) {
         String sql = "UPDATE orders SET order_date = ?, delivery_date = ?, status = ?, client_id = ?,dealer_id= ?, total_price = ? WHERE id = ?";
         jdbcTemplate.update(sql, order.getOrderDate(), order.getDeliveryDate(), order.getStatus(), order.getClientId(),order.getDealerId(), order.getTotalPrice(), order.getId());
     }
 
+    /**
+     * Metodo para eliminar un order de la base de datos.
+     * @param "id" El id del order a eliminar.
+     * @return void
+     *
+     */
     public void delete(int id) {
         String sql = "DELETE FROM orders WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
 
-    // Método para obtener el último ID insertado (order_id)
-    public int getLastInsertedOrderId() {
-        String sql = "SELECT LAST_INSERT_ID()";
-        return jdbcTemplate.queryForObject(sql, Integer.class);
-    }
 
+    /**
+     * Metodo para buscar un order por su id.
+     * @param "id" El id del order a buscar.
+     * @return El order encontrado.
+     *
+     */
     public OrdersEntity findById(int id) {
         String sql = "SELECT * FROM orders WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) ->
@@ -85,6 +112,12 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+    /**
+     * Metodo para buscar un order por su clientId.
+     * @param "clientId" El id del client a buscar.
+     * @return El order encontrado.
+     *
+     */
     public List<OrdersEntity> findByClientId(int clientId) {
         String sql = "SELECT * FROM orders WHERE client_id = ?";
         return jdbcTemplate.query(sql, new Object[]{clientId}, (rs, rowNum) ->
@@ -100,6 +133,12 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+    /**
+     * Metodo para buscar un order por su dealerId.
+     * @param "dealerId" El id del dealer a buscar.
+     * @return El order encontrado.
+     *
+     */
     public List<OrdersEntity> findByDealerId(int dealerId) {
         String sql = "SELECT * FROM orders WHERE dealer_id = ?";
         return jdbcTemplate.query(sql, new Object[]{dealerId}, (rs, rowNum) ->
@@ -116,6 +155,16 @@ public class OrdersRepository implements OrdersRepositoryInt {
     }
 
 
+
+    /**
+     * Metodo para obtener el cliente que más ha gastado en pedidos entregados.
+     * Se realiza una consulta SQL que agrupa los pedidos por cliente y suma el total gastado.
+     * El cliente con el mayor gasto se selecciona y se devuelve como un objeto TopSpenderDTO.
+     * @return Un objeto TopSpenderDTO que contiene la información del cliente que más ha gastado.
+     *
+     *
+     *
+     * */
     //RF 1: obtener el cliente que más ha gastado
     public TopSpenderDTO getTopSpender() {
         String sql = """
@@ -156,6 +205,15 @@ public class OrdersRepository implements OrdersRepositoryInt {
     }
 
 
+
+    /**
+     *
+     * Metodo para encontrar las entregas fallidas por ID de la compañia.*
+     * el metodo realiza una consulta SQL que busca las ordenes fallidas de una compañia en especifico.
+     * @param "companyId" El id de la compañia a buscar.
+     * @return Una lista de orders fallidas.
+     *
+     * */
     public List<OrdersEntity> findFailedOrdersByCompanyId(int companyId) {
         String sql = """
         SELECT 
@@ -187,6 +245,15 @@ public class OrdersRepository implements OrdersRepositoryInt {
 
 
 
+    /**
+     *
+     * Metodo para encontrar las entregas exitosas por ID de la compañia.*
+     * el metodo realiza una consulta SQL que busca las ordenes exitosas de una compañia en especifico.
+     * @param "companyId" El id de la compañia a buscar.
+     * @return Una lista de orders exitosas.
+     *
+     * */
+
     public List<OrdersEntity> findDeliveredOrdersByCompanyId(int companyId) {
         String sql = """
         SELECT 
@@ -216,11 +283,24 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+
+    /**
+     * Metodo para actualizar el estado de un pedido por ID de repartidor.
+     * @param "orderId" El id del pedido a actualizar.
+     * @param "dealerId" El id del repartidor que actualiza el pedido.
+     * @param "newStatus" El nuevo estado del pedido.
+     * @return void
+     *
+     */
     public void updateOrderStatusByDealerId(int orderId, int dealerId, String newStatus) {
         String sql = "UPDATE orders SET status = ? WHERE id = ? AND dealer_id = ?";
         jdbcTemplate.update(sql, newStatus, orderId, dealerId);
     }
-
+    /**
+     * Metodo para obtener los pedidos de una compañia por ID de compañia.
+     * @param "companyId" El id de la compañia a buscar.
+     * @return Una lista de orders de la compañia.
+     */
     //get all orders by company id
     public List<OrdersEntity> findOrdersByCompanyId(int companyId) {
         String sql = """
@@ -243,6 +323,12 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+
+    /**
+     * Metodo para obtener todos los productos de un pedido por ID de pedido.
+     * @param "orderId" El id del pedido a buscar.
+     * @return Una lista de productos del pedido.
+     */
     //Get all products by order id
     public List<ProductEntity> findProductsByOrderId(int orderId) {
         String sql = "SELECT p.* FROM products p JOIN order_products op ON p.id = op.product_id WHERE op.order_id = ?";
@@ -258,12 +344,13 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
-    //GET ID OF ORDER
-    public int getOrderIdByClientId(int clientId) {
-        String sql = "SELECT id FROM orders WHERE client_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{clientId}, Integer.class);
-    }
 
+    /**
+     * Metodo para obtener la orden En proceso por ID del repartidor.
+     * @param "dealerId" El id del repartidor a buscar.
+     * @return La orden En proceso encontrada.
+     *
+     */
     // Obtener la orden En proceso por ID del repartidor
     public OrdersEntity findActiveOrderByDealerId(int dealerId) {
         String sql = "SELECT * FROM orders WHERE dealer_id = ? AND status = 'EN PROCESO'";
@@ -281,21 +368,27 @@ public class OrdersRepository implements OrdersRepositoryInt {
         return orders.isEmpty() ? null : orders.get(0);
     }
 
+
+    /**
+     * Metodo para asignar un pedido a un repartidor.
+     * @param "orderId" El id del pedido a asignar.
+     * @param "dealerId" El id del repartidor a asignar.
+     * @return void
+     *
+     */
     public void assignOrderToDealer(int orderId, int dealerId) {
         String sql = "UPDATE orders SET dealer_id = ?, status = 'EN PROCESO' WHERE id = ?";
         jdbcTemplate.update(sql, dealerId, orderId);
     }
 
-    public void markAsDelivered(int orderId, String deliveryDate) {
-        String sql = "UPDATE orders SET status = 'ENTREGADO', delivery_date = ? WHERE id = ?";
-        jdbcTemplate.update(sql, deliveryDate, orderId);
-    }
 
-    public void markAsFailed(int orderId) {
-        String sql = "UPDATE orders SET status = 'FALLIDA' WHERE id = ?";
-        jdbcTemplate.update(sql, orderId);
-    }
 
+    /**
+     * Metodo para obtener los pedidos de un repartidor con el conteo de productos.
+     * @param "dealerId" El id del repartidor a buscar.
+     * @return Una lista de pedidos con el conteo de productos.
+     *
+     */
     public List<OrderTotalProductsDTO> findOrdersWithProductCountByDealerId(int dealerId) {
         String sql = """
         SELECT 
@@ -327,6 +420,13 @@ public class OrdersRepository implements OrdersRepositoryInt {
         );
     }
 
+
+    /**
+     * Metodo para obtener la orden En proceso por ID del repartidor con nombre y dirección del cliente.
+     * @param "dealerId" El id del repartidor a buscar.
+     * @return La orden En proceso encontrada con nombre y dirección del cliente.
+     *
+     */
     public OrderNameAddressDTO findActiveOrderNameAddresDTOByDealerId(int dealerId) {
         String sql = """
         SELECT 

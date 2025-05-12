@@ -15,19 +15,55 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
+
+/**
+ *
+ * La clase AuthController maneja las solicitudes de autenticación y registro de usuarios.
+ * Esta clase contiene métodos para registrar nuevos usuarios y validar credenciales de inicio de sesión.
+ *
+ *
+ * */
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
+
+
+    /**
+     * Servicio de usuarios.
+     * Este servicio se utiliza para interactuar con la base de datos de usuarios.
+     */
     @Autowired
     private UserService userService;
 
+
+
+    /**
+     *
+     * JwtUtil es una clase de utilidad para manejar la generación y validación de tokens JWT.
+     * Esta clase se utiliza para generar tokens JWT para los usuarios autenticados y validar tokens en solicitudes posteriores.
+     *
+     *
+     * */
     @Autowired
     private JwtUtil jwtUtil;
 
 
 
-    // Endpoint para registrar nuevos usuarios
+
+
+
+
+    /**
+     * Endpoint para registrar un nuevo usuario.
+     * Este endpoint recibe un objeto JSON con los datos del nuevo usuario y lo registra en la base de datos.
+     * Si el usuario es un cliente, se guardan los datos adicionales del cliente.
+     * Si el usuario es un dealer, se guardan los datos adicionales del dealer.
+     * Si el usuario es un administrador, se guardan los datos del administrador.
+     * @param "body" El objeto JSON con los datos del nuevo usuario.
+     * @return Una respuesta HTTP con el resultado del registro.
+     *
+     * */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, Object> body) {
         try {
@@ -62,6 +98,16 @@ public class AuthController {
                     .body(Map.of("success", false, "message", "Error al registrar usuario: " + e.getMessage()));
         }
     }
+
+    /**
+     * Endpoint para loggearse en la aplicación.
+     * Este endpoint recibe un objeto JSON con el nombre de usuario y la contraseña del usuario.
+     * Si las credenciales son válidas, se genera un token JWT y se devuelve en la respuesta.
+     * @param "body" El objeto JSON con el nombre de usuario y la contraseña del usuario.
+     * @return Una respuesta HTTP con el token JWT y el rol del usuario.
+     *
+     *
+     * */
     // Endpoint para el inicio de sesión
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {

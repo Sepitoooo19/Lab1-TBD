@@ -8,13 +8,35 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+/**
+ *
+ * La clase RatingController maneja las solicitudes relacionadas con las calificaciones.
+ * Esta clase contiene métodos para obtener, crear, actualizar y eliminar calificaciones en la base de datos.
+ *
+ *
+ * */
 @RestController
 @RequestMapping("/ratings")
 @CrossOrigin(origins = "*") // Permite llamadas desde tu frontend Nuxt
 public class RatingController {
 
+
+    /**
+     *
+     * Servicio de calificaciones.
+     * Este servicio se utiliza para interactuar con la base de datos de calificaciones.
+     *
+     * */
     private final RatingService ratingService;
 
+
+    /**
+     *
+     * Constructor de la clase RatingController.
+     * @param "ratingService" El servicio de calificaciones a utilizar.
+     *
+     * */
     public RatingController(RatingService ratingService) {
         this.ratingService = ratingService;
     }
@@ -23,13 +45,23 @@ public class RatingController {
     // CRUD BÁSICO
     // -----------------------------------------------------------------
 
-    /** Devuelve todas las calificaciones. */
+
+
+    /**
+     * Endpoint para obtener todas las calificaciones.
+     * Este endpoint devuelve una lista de todas las calificaciones en la base de datos.
+     * */
     @GetMapping
     public ResponseEntity<List<RatingEntity>> getAllRatings() {
         return ResponseEntity.ok(ratingService.getAllRatings());
     }
 
-    /** Obtiene una calificación por su ID. */
+
+
+    /**
+     * Endpoint para obtener una calificación por su ID.
+     * Este endpoint devuelve una calificación específica basada en su ID.
+     * */
     @GetMapping("/{id}")
     public ResponseEntity<RatingEntity> getRatingById(@PathVariable int id) {
         RatingEntity rating = ratingService.getRatingById(id);
@@ -37,7 +69,12 @@ public class RatingController {
                 : ResponseEntity.notFound().build();
     }
 
-    /** Crea una nueva calificación. */
+
+
+    /**
+     * Crea una nueva calificación.
+     * <p>Usa POST para crear un nuevo recurso.</p>
+     */
     @PostMapping
     public ResponseEntity<Void> addRating(@RequestBody RatingEntity rating) {
         ratingService.saveRating(rating);
@@ -56,7 +93,12 @@ public class RatingController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Elimina una calificación. */
+
+
+    /**
+     * Elimina una calificación por su ID.
+     * Este endpoint elimina una calificación específica basada en su ID.
+     * */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRating(@PathVariable int id) {
         ratingService.deleteRating(id);
@@ -67,7 +109,12 @@ public class RatingController {
     // CONSULTAS POR CLIENTE Y DEALER
     // -----------------------------------------------------------------
 
-    /** Calificaciones realizadas por un cliente específico. */
+
+
+    /**
+     * Calificaciones recibidas por un cliente dado su ID.
+     * Este endpoint devuelve una lista de calificaciones asociadas a un cliente específico.
+     * */
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<RatingEntity>> getRatingsByClientId(@PathVariable int clientId) {
         List<RatingEntity> ratings = ratingService.getRatingsByClientId(clientId);
@@ -76,7 +123,12 @@ public class RatingController {
                 : ResponseEntity.notFound().build();
     }
 
-    /** Calificaciones recibidas por un dealer dado su ID. */
+
+
+    /**
+     * Calificaciones recibidas por un dealer dado su ID.
+     * Este endpoint devuelve una lista de calificaciones asociadas a un dealer específico.
+     * */
     @GetMapping("/dealer/{dealerId}")
     public ResponseEntity<List<RatingEntity>> getRatingsByDealerId(@PathVariable int dealerId) {
         List<RatingEntity> ratings = ratingService.getRatingsByDealerId(dealerId);
