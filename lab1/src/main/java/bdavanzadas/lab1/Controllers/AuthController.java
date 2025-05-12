@@ -27,7 +27,7 @@ public class AuthController {
 
 
 
-
+    // Endpoint para registrar nuevos usuarios
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, Object> body) {
         try {
@@ -62,7 +62,7 @@ public class AuthController {
                     .body(Map.of("success", false, "message", "Error al registrar usuario: " + e.getMessage()));
         }
     }
-
+    // Endpoint para el inicio de sesión
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         String username = body.get("username");

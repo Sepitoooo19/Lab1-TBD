@@ -20,6 +20,7 @@ public class DealerController {
         this.dealerService = dealerService;
     }
 
+    // CRUD BASICO
     @GetMapping
     public ResponseEntity<List<DealerEntity>> getAllDealers() {
         List<DealerEntity> dealers = dealerService.getAllDealers();
@@ -61,13 +62,22 @@ public class DealerController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+    /**
+     * Calcula el tiempo promedio de entrega por dealer.
+     *
+     * @return Lista de mapas con {dealer_id, dealer_name, average_delivery_time}.
+     */
     @GetMapping("/average-delivery-time")
     public ResponseEntity<List<Map<String, Object>>> getAverageDeliveryTimeByDealer() {
         List<Map<String, Object>> result = dealerService.getAverageDeliveryTimeByDealer();
         return ResponseEntity.ok(result);
     }
-
+    /**
+     * Obtiene el nombre de un dealer a partir de su ID.
+     *
+     * @param dealerId identificador.
+     * @return 200 OK con el nombre o 404 si no existe (propagado por servicio).
+     */
     @GetMapping("/{id}/name")
     public ResponseEntity<String> getDealerNameById(@PathVariable("id") Integer dealerId) {
         String dealerName = dealerService.getDealerNameById(dealerId);
@@ -79,7 +89,12 @@ public class DealerController {
         List<Map<String, Object>> topDealers = dealerService.getTopPerformingDealers();
         return ResponseEntity.ok(topDealers);
     }
-
+    /**
+     * Devuelve los dealers con mejor desempeño (por ejemplo,
+     * menor tiempo de entrega o mayor número de pedidos).
+     *
+     * @return Lista de dealers destacados.
+     */
     @GetMapping("/average-delivery-time-authenticated")
     public ResponseEntity<Double> getAverageDeliveryTimeByAuthenticatedDealer() {
         try {
@@ -91,7 +106,13 @@ public class DealerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
+    /**
+     * Tiempo promedio de entrega para el dealer actualmente autenticado.
+     * Se asume que el Dealer está vinculado al usuario autenticado (por
+     * ejemplo, mediante Spring Security + UserDetails).
+     *
+     * @return 200 OK con el promedio, 403 si no autorizado, 500 en error.
+     */
     @GetMapping("/delivery-count")
     public ResponseEntity<Integer> getDeliveryCountByAuthenticatedDealer() {
         try {
@@ -103,8 +124,4 @@ public class DealerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Error inesperado
         }
     }
-
-
-
-
 }

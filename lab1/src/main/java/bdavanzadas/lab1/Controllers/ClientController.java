@@ -18,12 +18,13 @@ public class ClientController {
     public ClientController(ClientService clientService) {
         this.clientService = clientService;
     }
-
+    // Endpoint GET para obtener todos los clientes
     @GetMapping
     public ResponseEntity<List<ClientEntity>> getAllClients() {
         List<ClientEntity> clients = clientService.getAllClients();
         return new ResponseEntity<>(clients, HttpStatus.OK);
     }
+    // Endpoint GET para obtener un cliente por ID
     @GetMapping("/{id}")
     public ResponseEntity<ClientEntity> getClientById(@PathVariable int id) {
         ClientEntity client = clientService.getClientById(id);
@@ -33,12 +34,13 @@ public class ClientController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+    // Endpoint POST para crear un nuevo cliente
     @PostMapping
     public ResponseEntity<ClientEntity> createClient(@RequestBody ClientEntity client) {
         clientService.saveClient(client);
         return new ResponseEntity<>(client, HttpStatus.CREATED);
     }
+    // Endpoint PUT para actualizar un cliente existente
     @PutMapping("/{id}")
     public ResponseEntity<ClientEntity> updateClient(@PathVariable int id, @RequestBody ClientEntity client) {
         ClientEntity existingClient = clientService.getClientById(id);
@@ -50,6 +52,7 @@ public class ClientController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    // Endpoint DELETE para eliminar un cliente
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable int id) {
         ClientEntity existingClient = clientService.getClientById(id);
@@ -60,7 +63,7 @@ public class ClientController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+    // Endpoint GET para obtener el nombre de un cliente por ID
     @GetMapping("/name/{id}")
     public ResponseEntity<String> getClientNameById(@PathVariable int id) {
         String clientName = clientService.getNameByClientId(id);

@@ -28,6 +28,12 @@ public class SecurityConfig {
     @Autowired
     private JwtUtil jwtUtil;
 
+    /*
+     - Define reglas de autorización:
+     - Permite acceso público a rutas `/auth/**`, `/clients/**`, etc.
+     - Restringe acceso a `/companies/**` a usuarios con roles ADMIN, CLIENT o DEALER
+     - Requiere autenticación para otras rutas
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -41,6 +47,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /*Utiliza para el hash seguro de contraseñas `BCryptPasswordEncoder*/
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

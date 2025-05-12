@@ -33,7 +33,7 @@ public class CompanyController {
         System.out.println("Empresa encontrada: " + company.getName());
         return ResponseEntity.ok(company);
     }
-
+    //1. **Endpoints básicos CRUD**
     @PostMapping("/crear")
     public void create(@RequestBody CompanyEntity c) {
         service.saveCompany(c);
@@ -48,19 +48,19 @@ public class CompanyController {
     public void delete(@PathVariable int id) {
         service.deleteCompany(id);
     }
-
+    //- Obtiene las compañías con más entregas fallidas
     @GetMapping("/failed-deliveries")
     public ResponseEntity<List<CompanyEntity>> getCompaniesWithMostFailedDeliveries() {
         List<CompanyEntity> companies = service.getCompaniesWithMostFailedDeliveries();
         return ResponseEntity.ok(companies);
     }
-
+    //- Actualiza las métricas de todas las compañías
     @PostMapping("/update-metrics")
     public ResponseEntity<Void> updateCompanyMetrics() {
         service.updateCompanyMetrics();
         return ResponseEntity.ok().build();
     }
-
+    //- Obtiene las compañías ordenadas por volumen de comida entregada
     @GetMapping("/delivered-food-volume")
     public ResponseEntity<List<Map<String, Object>>> getCompaniesByDeliveredFoodVolume() {
         List<Map<String, Object>> companies = service.getCompaniesByDeliveredFoodVolume();

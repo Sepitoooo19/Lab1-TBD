@@ -16,11 +16,10 @@ import java.util.Map;
 public class OrderDetailsController {
 
     private final OrderDetailsService orderDetailsService;
-
     public OrderDetailsController(OrderDetailsService orderDetailsService) {
         this.orderDetailsService = orderDetailsService;
     }
-
+    // CRUD BÁSICO
     @GetMapping
     public ResponseEntity<List<OrderDetailsEntity>> getAllOrderDetails() {
         return ResponseEntity.ok(orderDetailsService.getAllOrderDetails());
@@ -64,12 +63,21 @@ public class OrderDetailsController {
             return ResponseEntity.notFound().build();
         }
     }
+    /**
+     * Devuelve el metodo de pago más utilizado en órdenes urgentes.
+     *
+     * @return 200 OK con un mapa {@code {paymentMethod: cantidad}}.
+     */
     @GetMapping("/urgent/payment-method")
     public ResponseEntity<Map<String, Integer>> getMostUsedPaymentMethodForUrgentOrders() {
         Map<String, Integer> result = orderDetailsService.getMostUsedPaymentMethodForUrgentOrders();
         return ResponseEntity.ok(result);
     }
-
+    /**
+     * Crea detalles de orden para la última orden registrada.
+     * @param requestBody mapa con los datos extraídos del body.
+     * @return 201 CREATED o 500 INTERNAL SERVER ERROR.
+     */
     @PostMapping("/create-for-last-order")
     public ResponseEntity<Void> createOrderDetailsForLastOrder(@RequestBody Map<String, Object> requestBody) {
         try {

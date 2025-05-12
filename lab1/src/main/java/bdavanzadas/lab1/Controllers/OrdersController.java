@@ -38,7 +38,7 @@ public class OrdersController {
     public OrdersController(OrdersService ordersService) {
         this.ordersService = ordersService;
     }
-
+    // CRUD BASICO
     @GetMapping
     public ResponseEntity<List<OrdersEntity>> getAllOrders() {
         return ResponseEntity.ok(ordersService.getAllOrders());
@@ -71,7 +71,10 @@ public class OrdersController {
         ordersService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
-
+    /**
+     * Pedidos para el cliente autenticado (según contexto de seguridad).
+     * Devuelve 403 si el usuario no es un cliente válido.
+     */
     @GetMapping("/client/orders")
     public ResponseEntity<List<OrdersEntity>> getOrdersByClient() {
         try {
@@ -83,19 +86,24 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Devuelve 500 para errores inesperados
         }
     }
-
+    /** Pedidos de un cliente dado su ID explícito. */
     @GetMapping("/client/{id}")
     public ResponseEntity<List<OrdersEntity>> getOrdersByClientId(@PathVariable int id) {
         List<OrdersEntity> orders = ordersService.getOrdersByClientId(id);
         return ResponseEntity.ok(orders);
     }
-
+    /** Cliente con mayor gasto total. */
     @GetMapping("/top-spender")
     public ResponseEntity<TopSpenderDTO> getTopSpender() {
         TopSpenderDTO topSpender = ordersService.getTopSpender();
         return ResponseEntity.ok(topSpender);
     }
-
+    /**
+     * Crea un pedido y lo asocia a una lista de IDs de productos.
+     *
+     * @param order      entidad OrdersEntity (en el body).
+     * @param productIds IDs de productos (query param: ?productIds=1&productIds=2 ...).
+     */
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(
             @RequestBody OrdersEntity order, // Cuerpo de la solicitud
@@ -112,7 +120,7 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la orden: " + e.getMessage());
         }
     }
-
+    /** Marca un pedido como entregado, registrando la fecha de entrega. */
     @PutMapping("/{id}/deliver")
     public ResponseEntity<String> marcarComoEntregado(@PathVariable int id) {
         ordersService.markAsDelivered(id, new Date());
@@ -157,7 +165,10 @@ public class OrdersController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    /**
+     * Actualiza el estado del pedido (ENTREGADO / FALLIDA) asegurando
+     * que el dealer autenticado sea el propietario de la orden.
+     */
     @PutMapping("/{id}/dealer/{dealerId}/status")
     public ResponseEntity<Void> updateOrderStatusByDealerId(
             @PathVariable int id,
@@ -171,7 +182,7 @@ public class OrdersController {
         ordersService.updateOrderStatusByDealerId(id, dealerId, requestBody.get("status"));
         return ResponseEntity.noContent().build();
     }
-
+    /** Devuelve los productos asociados a una orden. */
     @GetMapping("/{orderId}/products")
     public ResponseEntity<List<ProductEntity>> getProductsByOrderId(@PathVariable int orderId) {
         try {
@@ -208,7 +219,7 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    /** Marca un pedido como URGENTE. */
     @PutMapping("/{id}/urgent")
     public ResponseEntity<String> markOrderAsUrgent(@PathVariable int id) {
         try {
@@ -218,7 +229,7 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al marcar el pedido como URGENTE");
         }
     }
-
+    /** Pedidos asignados al dealer autenticado (array vacío si no hay). */
     @GetMapping("/dealer/orders")
     public ResponseEntity<List<OrdersEntity>> getOrdersByDealer() {
         try {
@@ -230,7 +241,7 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Devuelve 500 para errores inesperados
         }
     }
-
+    /** Orden activa (no finalizada) asignada al dealer autenticado. */
     @GetMapping("/dealer/active-order")
     public ResponseEntity<OrdersEntity> getActiveOrderByDealer() {
         try {
@@ -246,7 +257,7 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
+    /** Asigna una orden libre al dealer autenticado. */
     @PutMapping("/{id}/assign")
     public ResponseEntity<Void> assignOrderToDealer(@PathVariable int id) {
         try {
@@ -260,7 +271,10 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    /**
+     * Actualiza el estado de una orden (ENTREGADO/FALLIDA) verificando que
+     * el dealer autenticado sea dueño de la misma.
+     */
     @PutMapping("/{id}/status")
     public ResponseEntity<Void> updateOrderStatus(
             @PathVariable int id,
