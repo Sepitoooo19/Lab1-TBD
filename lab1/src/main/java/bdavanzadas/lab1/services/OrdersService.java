@@ -109,11 +109,8 @@ public class OrdersService {
     // Método para crear una orden y asociar productos mediante procedimiento almacenado
     // * USAR ESTA FUNCION EN VEZ DE createOrderWithProducts?
     public void createOrderWithProducts(OrdersEntity order, List<Integer> productIds) {
-        System.out.println("Datos de la orden: " + order);
-        System.out.println("IDs de productos: " + productIds);
 
         Long userId = userService.getAuthenticatedUserId();
-        System.out.println("ID del usuario autenticado: " + userId);
 
         String sql = "SELECT id FROM clients WHERE user_id = ?";
         Integer clientId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
@@ -130,7 +127,7 @@ public class OrdersService {
                 order.getStatus(),
                 order.getClientId(),
                 productIds.toArray(new Integer[0]),
-                order.getDealerId() != null ? order.getDealerId() : null
+                order.getDealerId() // puede ser null
         );
     }
 
@@ -141,19 +138,16 @@ public class OrdersService {
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
-
-
-
     @Transactional
     public void markAsDelivered(int orderId, Date deliveryDate) {
-        String sql = "UPDATE orders SET status = 'ENTREGADO', delivery_date = ? WHERE id = ?";
-        jdbcTemplate.update(sql, deliveryDate, orderId);
+        String sql = "CALL change_order_status(?, ?, ?)";
+        jdbcTemplate.update(sql, orderId, "ENTREGADO", deliveryDate);
     }
 
     @Transactional
     public void markAsFailed(int orderId) {
-        String sql = "UPDATE orders SET status = 'FALLIDA' WHERE id = ?";
-        jdbcTemplate.update(sql, orderId);
+        String sql = "CALL change_order_status(?, ?, ?)";
+        jdbcTemplate.update(sql, orderId, "FALLIDA", null); // no se requiere fecha
     }
 
     // Pedidos fallidos por ID de la empresa
