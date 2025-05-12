@@ -89,7 +89,7 @@ public class CompanyRepository {
    //RF 3: empresas con más entregas fallidas
     public List<CompanyEntity> getCompaniesWithMostFailedDeliveries() {
         String sql = """
-        SELECT 
+        SELECT
             c.id,
             c.name,
             c.email,
@@ -100,10 +100,10 @@ public class CompanyRepository {
             COUNT(o.id) AS deliveries, -- Total de entregas
             SUM(CASE WHEN o.status = 'FALLIDA' THEN 1 ELSE 0 END) AS failed_deliveries, -- Total de entregas fallidas
             SUM(o.total_price) AS total_sales -- Total de ventas
-        FROM 
+        FROM
             companies c
-        LEFT JOIN orders o ON c.id = o.client_id -- Relación entre empresas y pedidos
-        GROUP BY 
+                LEFT JOIN orders o ON c.id = o.client_id -- Relación entre empresas y pedidos
+        GROUP BY
             c.id, c.name, c.email, c.phone, c.address, c.rut, c.type
     """;
 
