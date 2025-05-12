@@ -143,37 +143,80 @@ CREATE OR REPLACE PROCEDURE register_order_with_products(
     p_order_date TIMESTAMP,
     p_status VARCHAR,
     p_client_id INT,
-    p_dealer_id INT DEFAULT NULL,
-    p_total_price FLOAT,
-    p_product_ids INT[]
+    p_product_ids INT[],
+    p_dealer_id INT DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
 DECLARE
 v_order_id INT;
     v_product_id INT;
+    v_total_price FLOAT := 0.0;
 BEGIN
-    -- 1. Insert order
+    -- Calcular el precio total de los productos
+SELECT COALESCE(SUM(price), 0)
+INTO v_total_price
+FROM products
+WHERE id = ANY(p_product_ids);
+
+-- Insertar la orden con el total calculado
 INSERT INTO orders (order_date, status, client_id, dealer_id, total_price)
-VALUES (p_order_date, p_status, p_client_id, p_dealer_id, p_total_price)
+VALUES (p_order_date, p_status, p_client_id, p_dealer_id, v_total_price)
     RETURNING id INTO v_order_id;
 
--- 2. Loop through product IDs
+-- Insertar los productos y actualizar stock
 FOREACH v_product_id IN ARRAY p_product_ids LOOP
-        -- a) Insert into order_products
         INSERT INTO order_products (order_id, product_id)
         VALUES (v_order_id, v_product_id);
 
-        -- b) Reduce stock
 UPDATE products
 SET stock = stock - 1
 WHERE id = v_product_id AND stock > 0;
 
--- Optional: raise exception if stock is insufficient
 IF NOT FOUND THEN
-            RAISE EXCEPTION 'Insufficient stock for product ID %', v_product_id;
+            RAISE EXCEPTION 'Sin stock para el producto ID %', v_product_id;
 END IF;
 END LOOP;
+END;
+$$;
+-- ========================
+
+-- 2 Cambiar el estado de un pedido con validación
+CREATE OR REPLACE PROCEDURE change_order_status(
+    p_order_id INT,
+    p_new_status VARCHAR,
+    p_delivery_date TIMESTAMP DEFAULT NULL
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+v_current_status VARCHAR;
+BEGIN
+    -- Validar que el pedido exista y obtener su estado actual
+SELECT status INTO v_current_status
+FROM orders
+WHERE id = p_order_id;
+
+IF NOT FOUND THEN
+        RAISE EXCEPTION 'Pedido con ID % no existe', p_order_id;
+END IF;
+
+    -- Validar que aún no esté finalizado
+    IF v_current_status IN ('ENTREGADO', 'FALLIDA') THEN
+        RAISE EXCEPTION 'El pedido ya ha sido finalizado con estado %', v_current_status;
+END IF;
+
+    -- Actualizar el estado y la fecha si corresponde
+    IF p_new_status = 'ENTREGADO' THEN
+UPDATE orders
+SET status = p_new_status,
+    delivery_date = COALESCE(p_delivery_date, NOW())
+WHERE id = p_order_id;
+ELSE
+UPDATE orders
+SET status = p_new_status
+WHERE id = p_order_id;
+END IF;
 END;
 $$;
 
