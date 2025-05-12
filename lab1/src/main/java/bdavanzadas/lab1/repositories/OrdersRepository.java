@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.repositories;
 
+import bdavanzadas.lab1.dtos.OrderNameAddressDTO;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.entities.OrdersEntity;
@@ -7,6 +8,8 @@ import bdavanzadas.lab1.entities.ProductEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import bdavanzadas.lab1.dtos.OrderTotalProductsDTO;
+import bdavanzadas.lab1.dtos.OrderNameAddressDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -293,8 +296,75 @@ public class OrdersRepository implements OrdersRepositoryInt {
         jdbcTemplate.update(sql, orderId);
     }
 
+    public List<OrderTotalProductsDTO> findOrdersWithProductCountByDealerId(int dealerId) {
+        String sql = """
+        SELECT 
+            o.id AS order_id,
+            o.order_date,
+            o.delivery_date,
+            o.status,
+            o.total_price,
+            COALESCE(od.total_products, 0) AS total_products
+        FROM 
+            orders o
+        LEFT JOIN 
+            order_details od ON o.id = od.order_id
+        WHERE 
+            o.dealer_id = ?
+        ORDER BY 
+            o.order_date DESC
+    """;
+
+        return jdbcTemplate.query(sql, new Object[]{dealerId}, (rs, rowNum) ->
+                new OrderTotalProductsDTO(
+                        rs.getInt("order_id"),
+                        rs.getTimestamp("order_date"),
+                        rs.getTimestamp("delivery_date"),
+                        rs.getString("status"),
+                        rs.getDouble("total_price"),
+                        rs.getInt("total_products")
+                )
+        );
+    }
+
+    public OrderNameAddressDTO findActiveOrderNameAddresDTOByDealerId(int dealerId) {
+        String sql = """
+        SELECT 
+            o.id AS order_id,
+            o.order_date,
+            o.delivery_date,
+            o.status,
+            o.total_price,
+            o.client_id,
+            c.name AS name_client,
+            c.address AS client_address
+        FROM 
+            orders o
+        LEFT JOIN 
+            clients c ON o.client_id = c.id
+        WHERE 
+            o.dealer_id = ? AND o.status = 'EN PROCESO'
+        LIMIT 1
+    """;
+
+        return jdbcTemplate.queryForObject(sql, new Object[]{dealerId}, (rs, rowNum) ->
+                new OrderNameAddressDTO(
+                        rs.getInt("order_id"),
+                        rs.getTimestamp("order_date"),
+                        rs.getTimestamp("delivery_date"),
+                        rs.getString("status"),
+                        rs.getDouble("total_price"),
+                        rs.getInt("client_id"),
+                        rs.getString("name_client"),
+                        rs.getString("client_address")
+                )
+        );
+    }
 
 
 
 
-}
+
+
+ }
+

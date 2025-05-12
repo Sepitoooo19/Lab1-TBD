@@ -19,6 +19,9 @@ public class DealerService {
     @Autowired
     private OrdersRepository ordersRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Transactional(readOnly = true)
     public List<DealerEntity> getAllDealers() {
         return dealerRepository.findAll();
@@ -52,10 +55,24 @@ public class DealerService {
         return dealerRepository.getTopPerformingDealers();
     }
 
-
+    //RF 04: TIEMPO PROMEDIO DE ESPERA
     public List<Map<String, Object>> getAverageDeliveryTimeByDealer() {
         return dealerRepository.getAverageDeliveryTimeByDealer();
     }
+
+    @Transactional(readOnly = true)
+    public Double getAverageDeliveryTimeByAuthenticatedDealer() {
+        // Obtener el ID del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+        return dealerRepository.getAverageDeliveryTimeByAuthenticatedDealer(userId);
+    }
+    @Transactional(readOnly = true)
+    public Integer getDeliveryCountByAuthenticatedDealer() {
+        // Obtener el ID del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+        return dealerRepository.getDeliveryCountByAuthenticatedDealer(userId);
+    }
+
 }
 
 

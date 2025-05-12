@@ -114,4 +114,46 @@ public class DealerRepository  implements DealerRepositoryInt {
 
         return jdbcTemplate.queryForList(sql);
     }
+
+    public Double getAverageDeliveryTimeByAuthenticatedDealer(Long userId) {
+        // Obtener el dealerId asociado al usuario autenticado
+        String sqlDealerId = "SELECT id FROM dealers WHERE user_id = ?";
+        Integer dealerId = jdbcTemplate.queryForObject(sqlDealerId, new Object[]{userId}, Integer.class);
+
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un repartidor asociado al usuario autenticado.");
+        }
+
+        // Calcular el tiempo promedio de espera para el dealerId
+        String sqlAvgTime = """
+            SELECT AVG(EXTRACT(EPOCH FROM (o.delivery_date - o.order_date)) / 3600) AS avg_delivery_time_hours
+            FROM orders o
+            WHERE o.dealer_id = ? AND o.status = 'ENTREGADO' AND o.delivery_date IS NOT NULL
+        """;
+
+        return jdbcTemplate.queryForObject(sqlAvgTime, new Object[]{dealerId}, Double.class);
+    }
+
+    public Integer getDeliveryCountByAuthenticatedDealer(Long userId) {
+        // Obtener el dealerId asociado al usuario autenticado
+        String sqlDealerId = "SELECT id FROM dealers WHERE user_id = ?";
+        Integer dealerId = jdbcTemplate.queryForObject(sqlDealerId, new Object[]{userId}, Integer.class);
+
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un repartidor asociado al usuario autenticado.");
+        }
+
+        // Contar las entregas realizadas por el dealerId
+        String sqlDeliveryCount = """
+            SELECT COUNT(*) 
+            FROM orders 
+            WHERE dealer_id = ? AND status = 'ENTREGADO'
+        """;
+
+        return jdbcTemplate.queryForObject(sqlDeliveryCount, new Object[]{dealerId}, Integer.class);
+    }
+
+
+
+
 }

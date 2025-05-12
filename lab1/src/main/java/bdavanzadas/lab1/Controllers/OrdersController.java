@@ -1,5 +1,7 @@
 package bdavanzadas.lab1.Controllers;
 
+import bdavanzadas.lab1.dtos.OrderNameAddressDTO;
+import bdavanzadas.lab1.dtos.OrderTotalProductsDTO;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.entities.ProductEntity;
@@ -299,6 +301,31 @@ public class OrdersController {
         }
     }
 
+
+    @GetMapping("/dealer/dto/orders")
+    public ResponseEntity<List<OrderTotalProductsDTO>> getOrdersByDealerDto() {
+        try {
+            List<OrderTotalProductsDTO> orders = ordersService.getOrdersWithProductCountByDealerId();
+            return ResponseEntity.ok(orders);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // Error de validación
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Error inesperado
+        }
+    }
+
+    @GetMapping("/dealer/dto/active-order")
+    public ResponseEntity<OrderNameAddressDTO> getActiveOrderNameAddressByDealer() {
+        try {
+            OrderNameAddressDTO activeOrder = ordersService.getActiveOrderNameAddresDTOByDealerId();
+            return ResponseEntity.ok(activeOrder);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // Error de validación
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Error inesperado
+        }
+    }
 
 
 

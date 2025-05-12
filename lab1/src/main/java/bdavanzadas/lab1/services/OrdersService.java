@@ -1,5 +1,6 @@
 package bdavanzadas.lab1.services;
 
+import bdavanzadas.lab1.dtos.OrderNameAddressDTO;
 import bdavanzadas.lab1.dtos.TopSpenderDTO;
 import bdavanzadas.lab1.entities.DealerEntity;
 import bdavanzadas.lab1.entities.ProductEntity;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import bdavanzadas.lab1.entities.OrdersEntity;
 import bdavanzadas.lab1.repositories.OrdersRepository;
+import bdavanzadas.lab1.dtos.OrderTotalProductsDTO;
 
 
 import java.util.ArrayList;
@@ -256,6 +258,37 @@ public class OrdersService {
 
         // Asignar orden al dealer
         ordersRepository.assignOrderToDealer(orderId, dealerId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderTotalProductsDTO> getOrdersWithProductCountByDealerId() {
+        Long userId = userService.getAuthenticatedUserId();
+
+        String sql = "SELECT id FROM dealers WHERE user_id = ?";
+        Integer dealerId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un dealer asociado al usuario con ID " + userId);
+        }
+
+        return ordersRepository.findOrdersWithProductCountByDealerId(dealerId);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderNameAddressDTO getActiveOrderNameAddresDTOByDealerId() {
+        // Obtener el ID del usuario autenticado
+        Long userId = userService.getAuthenticatedUserId();
+
+        // Obtener el dealerId asociado al usuario autenticado
+        String sql = "SELECT id FROM dealers WHERE user_id = ?";
+        Integer dealerId = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+
+        if (dealerId == null) {
+            throw new IllegalArgumentException("No se encontró un dealer asociado al usuario con ID " + userId);
+        }
+
+        // Llamar al repositorio para obtener la orden activa
+        return ordersRepository.findActiveOrderNameAddresDTOByDealerId(dealerId);
     }
 
 }

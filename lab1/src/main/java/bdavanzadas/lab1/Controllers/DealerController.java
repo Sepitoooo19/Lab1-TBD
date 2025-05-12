@@ -80,5 +80,31 @@ public class DealerController {
         return ResponseEntity.ok(topDealers);
     }
 
+    @GetMapping("/average-delivery-time-authenticated")
+    public ResponseEntity<Double> getAverageDeliveryTimeByAuthenticatedDealer() {
+        try {
+            Double avgTime = dealerService.getAverageDeliveryTimeByAuthenticatedDealer();
+            return ResponseEntity.ok(avgTime != null ? avgTime : 0.0);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/delivery-count")
+    public ResponseEntity<Integer> getDeliveryCountByAuthenticatedDealer() {
+        try {
+            Integer deliveryCount = dealerService.getDeliveryCountByAuthenticatedDealer();
+            return ResponseEntity.ok(deliveryCount != null ? deliveryCount : 0);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // Error de validación
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Error inesperado
+        }
+    }
+
+
+
 
 }
