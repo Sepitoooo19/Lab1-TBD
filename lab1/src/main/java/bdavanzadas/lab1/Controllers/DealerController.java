@@ -180,4 +180,30 @@ public class DealerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Error inesperado
         }
     }
+
+    /**
+     * Obtiene todos los datos del repartidor autenticado
+     * @return Datos consolidados del repartidor
+     */
+    @GetMapping("/me")
+    public ResponseEntity<?> getAuthenticatedDealerProfile() {
+        try {
+            Map<String, Object> dealerData = dealerService.getAuthenticatedDealerData();
+
+            if (dealerData == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "No se encontró perfil de repartidor para el usuario autenticado"));
+            }
+
+            return ResponseEntity.ok(dealerData);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "No autorizado", "details", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno del servidor", "details", e.getMessage()));
+        }
+    }
+
+
 }

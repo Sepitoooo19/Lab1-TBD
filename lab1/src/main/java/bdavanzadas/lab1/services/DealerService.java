@@ -9,6 +9,7 @@ import bdavanzadas.lab1.repositories.DealerRepository;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -148,6 +149,43 @@ public class DealerService {
         Long userId = userService.getAuthenticatedUserId();
         return dealerRepository.getDeliveryCountByAuthenticatedDealer(userId);
     }
+
+    /**
+     * Obtiene todos los datos del repartidor autenticado
+     * @return Mapa con los datos consolidados del repartidor
+     */
+    public Map<String, Object> getAuthenticatedDealerData() {
+        try {
+            Long userIdLong = userService.getAuthenticatedUserId();
+            int userId = Math.toIntExact(userIdLong); // Conversión segura
+
+            DealerEntity dealer = dealerRepository.findByUserId(userId);
+
+            if (dealer == null) {
+                throw new RuntimeException("No existe un repartidor asociado a este usuario");
+            }
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", dealer.getId());
+            data.put("name", dealer.getName());
+
+            // Manejo de valores nulos para las estadísticas
+            Double avgWaitTime = dealerRepository.getAverageDeliveryTime(dealer.getId());
+            data.put("avgWaitTime", avgWaitTime != null ? avgWaitTime : 0.0);
+
+            Double rating = dealerRepository.getAverageRating(dealer.getId());
+            data.put("rating", rating != null ? rating : "Sin calificaciones");
+
+            Integer deliveryCount = dealerRepository.getDeliveryCount(dealer.getId());
+            data.put("deliveryCount", deliveryCount != null ? deliveryCount : 0);
+
+            return data;
+
+        } catch (ArithmeticException e) {
+            throw new RuntimeException("ID de usuario inválido", e);
+        }
+    }
+
 
 }
 

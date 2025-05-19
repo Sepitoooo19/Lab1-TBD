@@ -240,6 +240,86 @@ public class DealerRepository  implements DealerRepositoryInt {
         return jdbcTemplate.queryForObject(sqlDeliveryCount, new Object[]{dealerId}, Integer.class);
     }
 
+    /**
+     * Obtiene la calificación promedio de un repartidor
+     * @param dealerId ID del repartidor
+     * @return Calificación promedio o null si no hay calificaciones
+     */
+    public Double getAverageRating(Integer dealerId) {
+        String sql = """
+        SELECT AVG(r.rating) 
+        FROM ratings r 
+        WHERE r.dealer_id = ?
+    """;
+
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{dealerId}, Double.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Obtiene el número de entregas de un repartidor
+     * @param dealerId ID del repartidor
+     * @return Número de entregas
+     */
+    public Integer getDeliveryCount(Integer dealerId) {
+        String sql = """
+        SELECT COUNT(*) 
+        FROM orders 
+        WHERE dealer_id = ? AND status = 'ENTREGADO'
+    """;
+
+        return jdbcTemplate.queryForObject(sql, new Object[]{dealerId}, Integer.class);
+    }
+
+    /**
+     * Obtiene el tiempo promedio de entrega de un repartidor
+     * @param dealerId ID del repartidor
+     * @return Tiempo promedio en horas o null si no hay entregas
+     */
+    public Double getAverageDeliveryTime(Integer dealerId) {
+        String sql = """
+        SELECT AVG(EXTRACT(EPOCH FROM (o.delivery_date - o.order_date)) / 3600)
+        FROM orders o
+        WHERE o.dealer_id = ? AND o.status = 'ENTREGADO' AND o.delivery_date IS NOT NULL
+    """;
+
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{dealerId}, Double.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * Busca un repartidor por el ID de usuario
+     * @param userId ID del usuario asociado al repartidor
+     * @return Entidad del repartidor
+     * Este metodo es para que funcione otro metodo
+     */
+    public DealerEntity findByUserId(int userId) {
+        String sql = "SELECT * FROM dealers WHERE user_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{userId}, (rs, rowNum) -> {
+                DealerEntity dealer = new DealerEntity();
+                dealer.setId(rs.getInt("id"));
+                dealer.setUserId(rs.getInt("user_id"));
+                dealer.setName(rs.getString("name"));
+                dealer.setRut(rs.getString("rut"));
+                dealer.setEmail(rs.getString("email"));
+                dealer.setPhone(rs.getString("phone"));
+                dealer.setVehicle(rs.getString("vehicle"));
+                dealer.setPlate(rs.getString("plate"));
+                return dealer;
+            });
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
 
 
 
