@@ -26,7 +26,11 @@ public class ClientEntity {
 
 
 
+<<<<<<< HEAD
 =======
+=======
+    
+>>>>>>> prueba2
     
 >>>>>>> prueba3
     private int userId; // Relación con UserEntity
