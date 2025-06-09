@@ -25,14 +25,6 @@ public class ClientEntity {
 
 
 
-<<<<<<< HEAD
-    
 
-    
-
-=======
-
-    
->>>>>>> origin/RamaSepu
     private int userId; // Relación con UserEntity
 }
