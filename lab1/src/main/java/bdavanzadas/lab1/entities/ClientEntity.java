@@ -22,12 +22,5 @@ public class ClientEntity {
     private String email;
     private String phone;
     private String address;
-
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> RamaSepu
     private int userId; // Relación con UserEntity
 }
