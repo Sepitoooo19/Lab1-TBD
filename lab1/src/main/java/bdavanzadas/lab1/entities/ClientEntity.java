@@ -22,7 +22,6 @@ public class ClientEntity {
     private String email;
     private String phone;
     private String address;
-    private String ubication;
 
 
     private int userId; // Relación con UserEntity
