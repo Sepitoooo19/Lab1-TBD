@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
  */
 public class ClientEntity {
     private int id;
+
+    
     private String name;
     private String rut;
     private String email;
@@ -28,7 +30,6 @@ public class ClientEntity {
     
 
     
-
 
     private int userId; // Relación con UserEntity
 }
