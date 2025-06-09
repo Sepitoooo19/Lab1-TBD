@@ -29,10 +29,18 @@ public class ClientRepository implements ClientRepositoryInt {
      *
      */
     public void save(ClientEntity client) {
-        String sql = "INSERT INTO clients (user_id, name, rut, email, phone, address) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, client.getUserId(), client.getName(), client.getRut(), client.getEmail(), client.getPhone(), client.getAddress());
-
-
+        String sql = "INSERT INTO clients (user_id, name, rut, email, phone, address, ubication) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 4326))";
+        jdbcTemplate.update(
+                sql,
+                client.getUserId(),
+                client.getName(),
+                client.getRut(),
+                client.getEmail(),
+                client.getPhone(),
+                client.getAddress(),
+                client.getUbication() // Debe ser un String en formato WKT, ej: "POINT(-70.12345 -33.98765)"
+        );
     }
 
     /**
@@ -41,8 +49,18 @@ public class ClientRepository implements ClientRepositoryInt {
      *
      */
     public void update(ClientEntity client) {
-        String sql = "UPDATE clients SET name = ?, rut = ?, email = ?, phone = ?, address = ? WHERE id = ?";
-        jdbcTemplate.update(sql, client.getName(), client.getRut(), client.getEmail(), client.getPhone(), client.getAddress(), client.getId());
+        String sql = "UPDATE clients SET name = ?, rut = ?, email = ?, phone = ?, address = ?, " +
+                "ubication = ST_GeomFromText(?, 4326) WHERE id = ?";
+        jdbcTemplate.update(
+                sql,
+                client.getName(),
+                client.getRut(),
+                client.getEmail(),
+                client.getPhone(),
+                client.getAddress(),
+                client.getUbication(), // WKT
+                client.getId()
+        );
     }
 
 
@@ -63,7 +81,8 @@ public class ClientRepository implements ClientRepositoryInt {
      *
      */
     public ClientEntity findById(int id) {
-        String sql = "SELECT * FROM clients WHERE id = ?";
+        String sql = "SELECT id, name, rut, email, phone, address, user_id, " +
+                "ST_AsText(ubication) as ubication FROM clients WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
             ClientEntity client = new ClientEntity();
             client.setId(rs.getInt("id"));
@@ -72,6 +91,7 @@ public class ClientRepository implements ClientRepositoryInt {
             client.setEmail(rs.getString("email"));
             client.setPhone(rs.getString("phone"));
             client.setAddress(rs.getString("address"));
+            client.setUbication(rs.getString("ubication")); // Asigna el WKT directamente
             return client;
         });
     }
@@ -82,7 +102,8 @@ public class ClientRepository implements ClientRepositoryInt {
      *
      */
     public List<ClientEntity> findAll() {
-        String sql = "SELECT * FROM clients";
+        String sql = "SELECT id, name, rut, email, phone, address, user_id, " +
+                "ST_AsText(ubication) as ubication FROM clients";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             ClientEntity client = new ClientEntity();
             client.setId(rs.getInt("id"));
@@ -91,6 +112,7 @@ public class ClientRepository implements ClientRepositoryInt {
             client.setEmail(rs.getString("email"));
             client.setPhone(rs.getString("phone"));
             client.setAddress(rs.getString("address"));
+            client.setUbication(rs.getString("ubication")); // WKT
             return client;
         });
     }

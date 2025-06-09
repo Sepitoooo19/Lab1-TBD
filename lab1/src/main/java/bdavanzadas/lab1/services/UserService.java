@@ -112,6 +112,7 @@ public class UserService {
         client.setPhone(phone);
         client.setAddress(address);
         client.setUserId(user.getId());
+        client.setUbication("POINT(0 0)"); // Asignar una ubicación por defecto, puede ser modificada posteriormente
         clientRepository.save(client);
     }
 

@@ -4,107 +4,64 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import bdavanzadas.lab1.entities.ClientEntity;
 import bdavanzadas.lab1.repositories.ClientRepository;
-import bdavanzadas.lab1.entities.UserEntity;
-
 import java.util.List;
+import java.util.regex.Pattern;
 
-
-/**
- *
- * La clase ClientService representa el servicio de clientes en la aplicación.
- * Esta clase contiene métodos para guardar, actualizar, eliminar y buscar clientes en la base de datos.
- *
- * */
 @Service
 public class ClientService {
 
-
-    /**
-     * Repositorio de clientes.
-     * Este repositorio se utiliza para interactuar con la base de datos de clientes.
-     */
     private final ClientRepository clientRepository;
 
-
-    /**
-     * Constructor de la clase ClientService.
-     * @param "clientRepository" El repositorio de clientes a utilizar.
-     */
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
     }
 
+    // Patrón para validar WKT (ej: "POINT(-70.123 -33.456)")
+    private static final Pattern WKT_PATTERN = Pattern.compile(
+            "^POINT\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"
+    );
 
-    /**
-     * Metodo para obtener todos los clientes de la base de datos.
-     * @return Una lista de clientes.
-     *
-     */
+    // --- Métodos existentes (con validación para save y update) ---
+
     @Transactional(readOnly = true)
     public List<ClientEntity> getAllClients() {
         return clientRepository.findAll();
     }
 
-
-    /**
-     * Metodo para buscar un cliente por su id.
-     * @param "id" El id del cliente a buscar.
-     * @return El cliente encontrado.
-     *
-     */
     @Transactional(readOnly = true)
     public ClientEntity getClientById(int id) {
         return clientRepository.findById(id);
     }
 
-
-    /**
-     * Metodo para guardar un cliente en la base de datos.
-     * @param "client" El cliente a guardar.
-     * @return void
-     */
     @Transactional
     public void saveClient(ClientEntity client) {
+        validateUbicacion(client.getUbication()); // Valida el WKT antes de guardar
         clientRepository.save(client);
     }
 
-
-    /**
-     * Metodo para actualizar un cliente en la base de datos.
-     * @param "client" El cliente a actualizar.
-     * @return void
-     *
-     */
     @Transactional
     public void updateClient(ClientEntity client) {
+        validateUbicacion(client.getUbication()); // Valida el WKT antes de actualizar
         clientRepository.update(client);
     }
 
-
-    /**
-     * Metodo para eliminar un cliente de la base de datos.
-     * @param "id" El id del cliente a eliminar.
-     * @return void
-     *
-     */
     @Transactional
     public void deleteClient(int id) {
         clientRepository.delete(id);
     }
 
-
-    /**
-     * Metodo para buscar el nombre de un cliente por su id de usuario.
-     * @param   "id" El id del cliente a buscar.
-     * @return El nombre del cliente encontrado.
-     *
-     */
     @Transactional(readOnly = true)
     public String getNameByClientId(int id) {
         ClientEntity client = clientRepository.findById(id);
         return client != null ? client.getName() : null;
     }
 
-
-
+    // --- Método de validación adicional ---
+    private void validateUbicacion(String ubicacion) {
+        if (ubicacion == null || !WKT_PATTERN.matcher(ubicacion).matches()) {
+            throw new IllegalArgumentException(
+                    "Formato WKT inválido. Debe ser 'POINT(longitud latitud)'."
+            );
+        }
+    }
 }

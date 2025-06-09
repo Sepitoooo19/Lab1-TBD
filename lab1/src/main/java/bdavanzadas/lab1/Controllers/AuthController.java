@@ -79,6 +79,7 @@ public class AuthController {
                 String email = (String) body.get("email");
                 String phone = (String) body.get("phone");
                 String address = (String) body.get("address");
+                String ubication = (String) body.get("ubication");
 
                 userService.registerClient(username, password, name, rut, email, phone, address);
             } else if ("DEALER".equals(role)) {
