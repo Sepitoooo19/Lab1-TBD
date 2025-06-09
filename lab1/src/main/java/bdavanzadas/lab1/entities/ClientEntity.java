@@ -25,10 +25,5 @@ public class ClientEntity {
 
 
 
-    
-
-    
-
-
     private int userId; // Relación con UserEntity
 }
